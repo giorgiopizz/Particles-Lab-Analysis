@@ -24,7 +24,7 @@ if __name__ == "__main__":
         tempi_up = manager.list()
         tempi_down = manager.list()
         for k in range(reps):
-            p = multiprocessing.Process(target=db_analysis_up_down, args=(k, n_obs, tempi_up, tempi_down))
+            p = multiprocessing.Process(target=db_analysis_up_down, args=(argv[2], k, n_obs, tempi_up, tempi_down))
             jobs.append(p)
             p.start()
         for proc in jobs:

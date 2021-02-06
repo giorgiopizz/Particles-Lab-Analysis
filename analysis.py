@@ -23,7 +23,7 @@ if __name__ == "__main__":
         manager = multiprocessing.Manager()
         tempi = manager.list()
         for k in range(reps):
-            p = multiprocessing.Process(target=db_analysis, args=(k, n_obs, tempi))
+            p = multiprocessing.Process(target=db_analysis, args=(argv[2],k, n_obs, tempi))
             jobs.append(p)
             p.start()
         for proc in jobs:

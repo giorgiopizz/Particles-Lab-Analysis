@@ -207,8 +207,8 @@ def up_or_down(signals, tempi_up, tempi_down):
                     print("errore")
 
 
-def db_analysis(j, n_obs, tempi):
-    conn = sqlite3.connect(argv[2])
+def db_analysis(filename, j, n_obs, tempi):
+    conn = sqlite3.connect(filename)
     c = conn.cursor()
     r = c.execute('SELECT samples FROM samples where event_id>? and event_id<?',(j*n_obs,(j+1)*n_obs+1))
     i=0
@@ -223,8 +223,8 @@ def db_analysis(j, n_obs, tempi):
 
 
 
-def db_analysis_up_down(j, n_obs, tempi_up, tempi_down):
-    conn = sqlite3.connect(argv[2])
+def db_analysis_up_down(filename, j, n_obs, tempi_up, tempi_down):
+    conn = sqlite3.connect(filename)
     c = conn.cursor()
     r = c.execute('SELECT samples FROM samples where event_id>? and event_id<?',(j*n_obs,(j+1)*n_obs+1))
     i=0
