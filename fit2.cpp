@@ -27,8 +27,8 @@ int main(int argc, char** argv)
 {
     CfgParser * gConfigParser = new CfgParser (argv[1]) ;
     string name = gConfigParser->readStringOpt("general::name");
-    vector<string> files = gConfigParser->readStringListOpt(name+"::filename");
-    string filename = files[0];
+    
+    string filename = gConfigParser->readStringOpt(name+"::filename");
 
     vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters") ;
 
