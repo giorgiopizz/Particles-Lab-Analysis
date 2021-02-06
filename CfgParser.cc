@@ -68,9 +68,6 @@ bool CfgParser::init(string filename)
             }
             pair <string, string> p = splitOptionLine (line);
             string optName = getTrimmedLine(p.first);
-            if (optName=="files"){
-                std::cout << "eccomi"<<std::endl;
-            }
             string optVal  = getTrimmedLine(p.second);
             if (config_[currsect].find(optName) != config_[currsect].end())
             {
@@ -116,9 +113,13 @@ void CfgParser::trimLine(string& line)
 string CfgParser::getTrimmedLine(const string& line)
 {
     if (line.empty()) return line;
-    size_t first = line.find_first_not_of(" \t");
-    size_t last  = line.find_last_not_of(" \t");
+    size_t first = line.find_first_not_of("\n\t\v\r\b ");
+    size_t last  = line.find_last_not_of("\n\t\v\r\b ");
+    // std::cout<< first << "\t" << last << std::endl;
+    // cout << line.length() << endl;
+    // if (line!="\n") cout << "trovato" <<line <<endl;
     string res = (first != string::npos ? line.substr(first, (last-first+1)) : ""); // if all whitespaces, return empty string
+    // std::cout << line<< "\n" << res << "\n" << string::npos << std::endl;
     return res;
 }
 

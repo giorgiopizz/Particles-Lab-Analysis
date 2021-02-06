@@ -26,14 +26,15 @@ using namespace std;
 int main(int argc, char** argv)
 {
     CfgParser * gConfigParser = new CfgParser (argv[1]) ;
-    vector<string> nome = gConfigParser->readStringListOpt("general::name");
-    string filename = nome[0];
-    
-    vector<float> parameters = gConfigParser->readFloatListOpt ("general::parameters") ;
+    string name = gConfigParser->readStringOpt("general::name");
+    vector<string> files = gConfigParser->readStringListOpt(name+"::filename");
+    string filename = files[0];
 
-    vector<float> range = gConfigParser->readFloatListOpt ("general::range") ;
-    float bin = gConfigParser->readFloatOpt ("general::bin") ;
+    vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters") ;
 
+    vector<float> range = gConfigParser->readFloatListOpt (name+"::range") ;
+    float bin = gConfigParser->readFloatOpt (name+"::bin") ;
+    int search = gConfigParser->readIntOpt (name+"::search") ;
 
   TApplication* myApp = new TApplication("myApp", NULL, NULL);
 
@@ -84,7 +85,7 @@ int main(int argc, char** argv)
   // func->SetParameter(4, 386);
   for (int i=0; i<parameters.size(); i++){
 
-      if(i!=1){func->FixParameter(i, parameters[i]);}
+      if(i!=search){func->FixParameter(i, parameters[i]);}
       else{func->SetParameter(i, parameters[i]);}
   }
 
