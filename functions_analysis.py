@@ -60,6 +60,17 @@ def pos_impulso(der):
     return inizio_impulsi
 
 
+def intersect(signal, value):
+    positions = []
+    found = False
+    for i in range(len(signal)):
+        if not found and signal[i]<value:
+            positions.append(i)
+            found = True
+        elif found and signal[i]>value:
+            found = False
+    return positions
+
 def start_impulso(der):
     # non mi piace la funzione sopra che identifica al posizione dello start dell'impulso
     # qui sfruttando la derivata guardo solo se la derivata supera un certo valore soglia val_th

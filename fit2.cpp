@@ -21,6 +21,7 @@
 
 using namespace std;
 
+//background shoul be 2*r_start*r_stop*(10e-6)/bins*T_measure
 
 int main(int argc, char** argv)
 {
