@@ -32,7 +32,8 @@ def sovrapposizione_quadra(signals):
         #(np.min(signals[i])+np.max(signals[i]))/2
         half_square = 1250
         cond_array = signals[i]<half_square
-        #the other signal
+        #the other signal is signals[(i+1)%2]
+        # check if there's overlap between the two
         a = signals[(i+1)%2][cond_array][signals[(i+1)%2][cond_array]<half_square]
         if len(a)>0:
             return True
