@@ -19,16 +19,25 @@ if __name__ == "__main__":
         print(lenght[0])
         reps = ceil(lenght[0]/n_obs)
         print(reps)
-        jobs = []
-        manager = multiprocessing.Manager()
-        tempi_up = manager.list()
-        tempi_down = manager.list()
+        # jobs = []
+        # manager = multiprocessing.Manager()
+        # tempi_up = manager.list()
+        # tempi_down = manager.list()
+        # for k in range(reps):
+        #     p = multiprocessing.Process(target=db_analysis_up_down, args=(argv[2], k, n_obs, tempi_up, tempi_down))
+        #     jobs.append(p)
+        #     p.start()
+        # for proc in jobs:
+        #     proc.join()
+        tempi_up = []
+        tempi_down = []
         for k in range(reps):
-            p = multiprocessing.Process(target=db_analysis_up_down, args=(argv[2], k, n_obs, tempi_up, tempi_down))
-            jobs.append(p)
-            p.start()
-        for proc in jobs:
-            proc.join()
+            db_analysis_up_down(argv[2], k, n_obs,tempi_up, tempi_down)
+            # p = multiprocessing.Process(target=db_analysis_up_down, args=(argv[2], k, n_obs, tempi_up, tempi_down))
+            # jobs.append(p)
+            # p.start()
+        # for proc in jobs:
+        #     proc.join()
         with open(argv[3]+'_up.txt', 'w') as file:
             for i in tempi_up:
                 file.write(str(i)+"\n")

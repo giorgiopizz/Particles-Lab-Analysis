@@ -1,5 +1,6 @@
 import sqlite3
 import numpy as np
+import matplotlib.pyplot as plt
 ch_max = 4096
 
 def delta(arr1):
@@ -25,40 +26,24 @@ def minmax(derivata):
         return [start,stop+20]
 
 
-def sovrapposizione_quadra(signals):
+def square_overlap(signals):
     #signals is a list of np.arrays
+
     for i in range(2):
-        #loop sui canali, controllo se la quadra d
-        #(np.min(signals[i])+np.max(signals[i]))/2
-        half_square = 1250
-        cond_array = signals[i]<half_square
-        #the other signal is signals[(i+1)%2]
+        #loop over channels, check for each square if there's overlap with the other
+
+        cond_array = signals[i]<max(signals[i])-500
+        # the other signal is signals[(i+1)%2]
         # check if there's overlap between the two
-        a = signals[(i+1)%2][cond_array][signals[(i+1)%2][cond_array]<half_square]
-        if len(a)>0:
+        # subarray of the other channel where this channel is active
+
+        a = signals[(i+1)%2][cond_array]
+        # subarray of the above where also the other channel is active
+        b = a[a<max(signals[(i+1)%2])-500]
+        if len(b)>0:
             return True
         else:
             return False
-
-def pos_impulso(der):
-    derivata_attiva = False
-    #max_encountered = False
-    #m=0
-    inizio_impulsi = []
-    for i in range(len(der)):
-        if der[i] < -200 and not derivata_attiva:
-            inizio_impulsi.append(i)
-            derivata_attiva=True
-            m = -10000
-        elif der[i] >-200 and derivata_attiva :
-            derivata_attiva = False
-        """elif m != 0 and der[i]<m:
-            max_encountered = True
-        elif max_encountered and der[i]<200 and der[i]>-200:
-            max_encountered = False
-            derivata_attiva = False
-            m=0"""
-    return inizio_impulsi
 
 
 def intersect(signal, value):
@@ -72,55 +57,47 @@ def intersect(signal, value):
             found = False
     return positions
 
+
+
 def start_impulso(der):
     # non mi piace la funzione sopra che identifica al posizione dello start dell'impulso
     # qui sfruttando la derivata guardo solo se la derivata supera un certo valore soglia val_th
     val_th = -400
-    found = False
-    posizioni = []
-    # appena diventa true memorizzo la posizione
-    for i in range(len(der)):
-        if not found and der[i]<val_th:
-            posizioni.append(i)
-            found = True
-        elif found and der[i]>val_th:
-            found = False
+    return intersect(der, val_th)
     #quindi quello che si fa è guardare quando derivata supera il valore soglia, appena lo supera si registra la posizione
     # appena invece si scende sotto la soglia bisogna resettare found
-    return posizioni
 
 
-def doppia(der):
-    #start e stop della quadra
-    """start = pos_impulso(der)
-    stop = pos_impulso(der*(-1))"""
+
+def double_square(der):
+    # should return a list of all the real starts of pulse
+    # if a double/triple... square is present should return only the first start
+    # start e stop della quadra
     start = start_impulso(der)
     stop = start_impulso(der*(-1))
-    if len(start)!=len(stop):
+
+    if len(start)!=len(stop) or len(start)==0:
         # non è una doppia ma va scartata perché ci siamo persi o uno start o uno stop
-        return True
-
+        return []
     for i in range(len(start)):
-        if stop[i]>start[i]:
-            #allora è lo stop associato a questo start
-            lasso = stop[i]-start[i]
-            if i+1<len(start) and start[i+1]-stop[i]<lasso:
+        if start[i]>=stop[i]:
+            # then the i-th stop is not associated with the i-th start
+            return []
 
-                return True
+    # time width of a square pulse
+    time_width = max(np.array(stop)-np.array(start))
+    pulses_start = []
+    for i in range(len(start)):
+
+        #lasso = stop[i]-start[i]
+        if i>1 and stop[i-1]-start[i]<2*time_width:
+            # there is a double square
+            pass
         else:
-            #ci siamo persi uno start di un impulso
-            return True
+            pulses_start.append(start[i])
+    return pulses_start
 
-            """#lo stop i+1 è associato a start i
-            #controllo per essere sicuro
-            if stop[i+1]>start[i]:
-                lasso = stop[i+1]-start[i]
-                if start[i+1]-stop[i+1]<lasso:
-                    return True
-            else:
-                #dò errore
-                raise"""
-    return False
+
 
 def save_vec (mode, tempi, j):
     with open("tempi.txt",mode) as file:
@@ -149,6 +126,8 @@ def convert_samples(sample):
     for i in sample.split(b' '):
         l.append(int(i.decode("utf-8")))
     return l
+
+
 def check_signals(signals,tempi):
     if not sovrapposizione_quadra(signals):
 
@@ -193,30 +172,47 @@ def check_signals(signals,tempi):
                 # fig1.savefig("immagini/plot_corretti_"+str(i)+".jpg")
     #plt.close()
 
+def plot(signals,i):
+    der1 = delta(signals[0])
+    der2 = delta(signals[1])
+    interval = [min(minmax(der1)[0],minmax(der2)[0]),max(minmax(der1)[1],minmax(der2)[1])]
+    fig1, ax1 = plt.subplots(1, 1, tight_layout=True)
+    ax1.plot(np.arange(ch_max)[interval[0]:interval[1]],signals[0][interval[0]:interval[1]],label='Ch0')
+    ax1.plot(np.arange(ch_max)[interval[0]:interval[1]],signals[1][interval[0]:interval[1]], label='Ch1')
+    ax1.set_title("Evento "+str(i))
+    ax1.set_xlabel("time")
+    plt.legend()
+    fig2, ax2 = plt.subplots()
+    #print(len())
+    ax2.plot(np.arange(ch_max-1)[interval[0]:interval[1]],der1[interval[0]:interval[1]])
+    ax2.plot(np.arange(ch_max-1)[interval[0]:interval[1]],der2[interval[0]:interval[1]])
+    #plt.show()
+    fig1.savefig("immagini/plot_nuovi_"+str(i)+".jpg")
+    fig2.savefig("immagini/plot_nuovi_"+str(i)+"_der.jpg")
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+
 def up_or_down(signals, tempi_up, tempi_down):
-    if not sovrapposizione_quadra(signals):
+    if not square_overlap(signals):
+        der1 = delta(signals[0])
+        der2 = delta(signals[1])
+        interval = [min(minmax(der1)[0],minmax(der2)[0]),max(minmax(der1)[1],minmax(der2)[1])]
 
-        derivata1 = delta(signals[0])
-        derivata2 = delta(signals[1])
-        interval = [min(minmax(derivata1)[0],minmax(derivata2)[0]),max(minmax(derivata1)[1],minmax(derivata2)[1])]
-        #ulteriore controllo per vedere se ci sono esattamente un impulso di start ed uno di stop (tot = 2)
-        impulsi1 = pos_impulso(derivata1)
-        impulsi2 = pos_impulso(derivata2)
-
-        if (len(impulsi1) + len(impulsi2)) == 2:
-            if not (doppia(derivata1) or doppia(derivata2)):
-
-                if len(impulsi1) == 2:
+        real_pulses1 = double_square(der1)
+        real_pulses2 = double_square(der2)
+        if (len(real_pulses1) + len(real_pulses2)) == 2:
+                if len(real_pulses1) == 2:
                     #up decay
-                    time_diff = impulsi1[1]-impulsi1[0]
+                    time_diff = real_pulses1[1]-real_pulses1[0]
                     tempi_up.append(time_diff)
-                elif len(impulsi1)==1 and len(impulsi2)==1 and impulsi1[0]<impulsi2[0]:
+                elif len(real_pulses1)==1 and len(real_pulses2)==1 and real_pulses1[0]<real_pulses2[0]:
                     #down decay
-                    time_diff = impulsi2[0]-impulsi1[0]
+                    time_diff = real_pulses1[0]-real_pulses2[0]
                     tempi_down.append(time_diff)
 
                 else:
-                    print("errore")
+                    print("error")
 
 
 def db_analysis(filename, j, n_obs, tempi):
@@ -248,4 +244,27 @@ def db_analysis_up_down(filename, j, n_obs, tempi_up, tempi_down):
         else:
             signals.append(np.array(convert_samples(row[0])))
             up_or_down(signals, tempi_up, tempi_down)
+
         i+=1
+
+
+
+def dead_time(filename, j, n_obs, times):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+    r = c.execute('SELECT time_stamp FROM events where id>? and id<?',(j*n_obs,(j+1)*n_obs+1))
+    i=0
+    prev_time = 0
+    for row in r:
+        if prev_time !=0:
+            times.append(row[0]-prev_time)
+
+        prev_time = row[0]
+
+def rate_tot(filename):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+    t_i = c.execute('SELECT MIN(time_stamp) FROM events').fetchone()[0]
+    t_f = c.execute('SELECT MAX(time_stamp) FROM events').fetchone()[0]
+    n = c.execute('SELECT COUNT(*) FROM events').fetchone()[0]
+    return n/(t_f-t_i)
