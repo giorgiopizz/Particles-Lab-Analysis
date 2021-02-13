@@ -5,6 +5,10 @@ import DT5751read as dt
 from sys import argv
 from math import ceil
 import multiprocessing
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 from functions_analysis import convert_samples, ch_max, delta, start_impulso, intersect
 
 
@@ -40,6 +44,7 @@ def discr_calib(signals,i):
         n_50+=1
         bool_50 = True
 
+    # PLOT options
     # signal = signal[500:2000]
     # discr = discr[500:2000]
     # y_ground = np.ones(len(signal)) * ground

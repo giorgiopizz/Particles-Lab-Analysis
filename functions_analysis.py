@@ -246,25 +246,3 @@ def db_analysis_up_down(filename, j, n_obs, tempi_up, tempi_down):
             up_or_down(signals, tempi_up, tempi_down)
 
         i+=1
-
-
-
-def dead_time(filename, j, n_obs, times):
-    conn = sqlite3.connect(filename)
-    c = conn.cursor()
-    r = c.execute('SELECT time_stamp FROM events where id>? and id<?',(j*n_obs,(j+1)*n_obs+1))
-    i=0
-    prev_time = 0
-    for row in r:
-        if prev_time !=0:
-            times.append(row[0]-prev_time)
-
-        prev_time = row[0]
-
-def rate_tot(filename):
-    conn = sqlite3.connect(filename)
-    c = conn.cursor()
-    t_i = c.execute('SELECT MIN(time_stamp) FROM events').fetchone()[0]
-    t_f = c.execute('SELECT MAX(time_stamp) FROM events').fetchone()[0]
-    n = c.execute('SELECT COUNT(*) FROM events').fetchone()[0]
-    return n/(t_f-t_i)
