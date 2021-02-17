@@ -1,4 +1,5 @@
-# Particles Lab Analysis
+# Particles Lab Analysis Update
+(Just in case I mess up with something :) )
 ***
 File converters
 - analysis.py -> simple analysis, run with -db or -xml to specify input file format, also include as third parameter name for the output file (without ".txt")
