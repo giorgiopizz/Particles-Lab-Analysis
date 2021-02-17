@@ -1,11 +1,15 @@
 import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
-import DT5751read as dt
 from sys import argv
 from math import ceil
 import multiprocessing
-from functions_analysis import convert_samples, ch_max, delta, start_impulso, intersect
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+import lib.DT5751read as dt
+from lib.functions_analysis import convert_samples, ch_max, delta, start_impulso, intersect
 
 
 
@@ -37,9 +41,9 @@ def discr_calib(signals,i):
         pass
 
     else:
-        n_50+=1
         bool_50 = True
 
+    # PLOT options
     # signal = signal[500:2000]
     # discr = discr[500:2000]
     # y_ground = np.ones(len(signal)) * ground
@@ -78,4 +82,6 @@ if __name__ == "__main__":
     for i in range(3):
         t_50 = mean(times["50"][i*20:(i+1)*20])
         t_75 = mean(times["75"][i*20:(i+1)*20])
-        print("for {}-th discriminator we got \nt_50: {}\nt_75: {}".format(i+1, t_50,t_75))
+        std_50 = np.std(times["50"][i*20:(i+1)*20])
+        std_75 = np.std(times["75"][i*20:(i+1)*20])
+        print("for {}-th discriminator we got \nt_50: {}±{}\nt_75: {}±{}".format(i+1, t_50,std_50,t_75,std_75))
