@@ -23,9 +23,18 @@ using namespace std;
 
 //background shoul be 2*r_start*r_stop*(10e-6)/bins*T_measure
 
+string trimTitle (const string & title){
+    string result = title;
+    while (result.find(" ") != string::npos){
+        result.erase(result.find(" "), 1);
+    }
+    return result;
+}
+
 int main(int argc, char** argv)
 {
-        CfgParser * gConfigParser = new CfgParser (argv[1]);
+        char config_file[] = "fit.cfg";
+        CfgParser * gConfigParser = new CfgParser (config_file);
         string name = gConfigParser->readStringOpt("general::name");
 
         int function_type = gConfigParser->readIntOpt (name+"::f_type");
@@ -34,12 +43,14 @@ int main(int argc, char** argv)
         string filename = gConfigParser->readStringOpt(name+"::filename");
 
         string title = gConfigParser->readStringOpt(name+"::title");
-        
+
+        int save = gConfigParser->readIntOpt(name+"::save");
+
         vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters");
 
         vector<float> range = gConfigParser->readFloatListOpt (name+"::range");
         float bin = gConfigParser->readFloatOpt (name+"::bin");
-        int search = gConfigParser->readIntOpt (name+"::search");
+        //int search = gConfigParser->readIntOpt (name+"::search");
 
         TApplication* myApp = new TApplication("myApp", NULL, NULL);
 
@@ -69,10 +80,11 @@ int main(int argc, char** argv)
         // func->SetParameter(3, pos_tau);
         // func->SetParLimits(3, pos_tau-pos_tau*0.05,pos_tau+pos_tau*0.05);
         // func->SetParameter(4, 386);
+
+
         for (int i=0; i<parameters.size(); i++) {
 
-                if(i!=search) {func->FixParameter(i, parameters[i]);}
-                else{func->SetParameter(i, parameters[i]);}
+                func->SetParameter(i, parameters[i]);
         }
 
         TH1F *h = new TH1F("h", "example histogram",bin,0,10);
@@ -102,7 +114,8 @@ int main(int argc, char** argv)
         h->SetTitle(title.c_str());
         cnv->Modified();
         cnv->Update();
-        //cnv->Print("fit_vita_media.png", "png");
+
+        if (save == 1) cnv->Print((trimTitle(title)+".png").c_str(), "png");
         myApp->Run();
         return 0;
 }
