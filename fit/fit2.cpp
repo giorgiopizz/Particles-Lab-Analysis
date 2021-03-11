@@ -1,5 +1,5 @@
 /*
-   c++ -o fit2 fit2.cpp `root-config --cflags --glibs` CfgParser.cc -lm
+   c++ -o fit2 fit2.cpp `root-config --cflags --glibs` ../lib/CfgParser.cc -lm
  */
 
 #include <iostream>
@@ -17,7 +17,7 @@
 #include "TFitResult.h"
 #include "TMatrixDSym.h"
 #include "TMath.h"
-#include "CfgParser.h"
+#include "../lib/CfgParser.h"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ string trimTitle (const string & title){
 
 int main(int argc, char** argv)
 {
-        char config_file[] = "fit.cfg";
+        char config_file[] = "../fit.cfg";
         CfgParser * gConfigParser = new CfgParser (config_file);
         string name = gConfigParser->readStringOpt("general::name");
 
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
                 func->SetParameter(i, parameters[i]);
         }
 
-        TH1F *h = new TH1F("h", "example histogram",bin,0,10);
+        TH1F *h = new TH1F("h", "example histogram",bin,0,11);
         ifstream inp;
         double x;
         inp.open(filename);
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
         cnv->Modified();
         cnv->Update();
 
-        if (save == 1) cnv->Print((trimTitle(title)+".png").c_str(), "png");
+        if (save == 1) cnv->Print(("images/"+trimTitle(title)+".png").c_str(), "png");
         myApp->Run();
         return 0;
 }

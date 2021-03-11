@@ -1,5 +1,5 @@
 /*
-c++ -o stability stability.cpp `root-config --cflags --glibs`
+c++ -o stability stability.cpp `root-config --cflags --glibs` ../lib/CfgParser.cc
 */
 
 #include <iostream>
@@ -18,6 +18,8 @@ c++ -o stability stability.cpp `root-config --cflags --glibs`
 #include "TFitResult.h"
 #include "TMatrixDSym.h"
 #include "TMath.h"
+#include "TH2D.h"
+#include "../lib/CfgParser.h"
 
 
 using namespace std;
@@ -58,36 +60,50 @@ int main(int argc, char** argv)
   r->Print("V");
 */
 
-  TCanvas* cnv = new TCanvas("myC1","myC1",10,10,1200,800);
+  //TCanvas* cnv = new TCanvas("myC1","myC1",10,10,1200,800);
 
-  ofstream myfile;
-  myfile.open("stability.txt");
+
+  char config_file[] = "../fit.cfg";
+  CfgParser * gConfigParser = new CfgParser (config_file);
+  string name = gConfigParser->readStringOpt("general::name");
+
+  string filename = gConfigParser->readStringOpt(name+"::filename");
+
+
+
+  ofstream tau,chi;
+  tau.open(("files/tau_"+name+".txt").c_str());
+  chi.open(("files/chi_"+name+".txt").c_str());
   //gStyle->SetOptFit(1111);
   //TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])",0.5, 10);
-  double xmin=0, ymin = 10;
-  double nbins=0;
-  double x_increment = (double)(4.5-0)/400;
-  double bins_increment = (double)(100-5)/400;
-  for(int i=0; i< 200;i++){
-      xmin = i*x_increment;
-      ymin = 10-xmin;
-      TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])+[2]",xmin, ymin);
-      func->SetParameter(0,35);
-      func->SetParameter(1,2);
-      func->SetParameter(2,0);
-      for(int j=0;j<400;j++){
-          nbins = (int)5+j*bins_increment;
-          cout << "xmin: " << xmin << "\nnbins: " << nbins<<endl;
+  double x = 0.25, y = 11;
+  int nbins, nbins_min=10, nbins_max = 240;
+  nbins = nbins_min;
+  int k = 0;
+  // minimum range lenght should be 4, this means that after 400 iterations x=4.625 and y = 6.625
+  double x_increment = 2.375/100;
+
+  //double bins_increment = 1;
+  for(int i=0; i< 101;i++){
+      x = 0.25 + i*x_increment;
+      y = 11 - i*x_increment;
+      TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])+[2]",x, y);
+      func->SetParameter(0,5000);
+      func->SetParameter(1,2.2);
+      func->SetParameter(2,100);
+      for(int j=0;j<nbins_max-nbins_min+1;j++){
+          nbins = 10+j;
+          //cout << "xmin: " << xmin << "\nnbins: " << nbins<<endl;
 
 
-          TH1F *h = new TH1F("h", "example histogram",nbins,0,10);
+          TH1F *h = new TH1F("h", "example histogram",nbins,0,11);
           ifstream inp;
           double x;
-          inp.open("tempi_cerbero_mezzo_corr.txt");
+          inp.open(filename);
           while(!(inp >> x)==0){h->Fill(x);}
           inp.close();
-          cnv->cd();
-          h->Draw();
+          //cnv->cd();
+          //h->Draw();
           //h->Fit(func);
 
           /*
@@ -97,12 +113,17 @@ int main(int argc, char** argv)
           graph->Draw("AP");*/
           /*graph->GetXaxis()->SetTitle("Channels[mV]");
           graph->GetYaxis()->SetTitle("Energies[KeV]");*/
-          TFitResultPtr r = h->Fit("fun","SR");
-          cout << "Fit status: "  << r->Status() << endl;
-          if(r->Status()==0){
-              myfile << xmin <<"\t"<< nbins<<"\t"<<r->Parameter(1)<<endl;
+          TFitResultPtr r = h->Fit("fun","SRQ");
+          //cout << "Fit status: "  << r->Status() << endl;
+          if(r->Status()==0 && r->Parameter(1)<4.0 && r->Parameter(1)>1.0){
+              tau << i <<"\t"<< j <<"\t"<<r->Parameter(1)<<endl;
+              chi << i <<"\t"<< j <<"\t"<<r->Chi2()/r->Ndf()<<endl;
           }
-          cout << "Vita media: " << func->GetParameter(1) << " microsec ± " <<  r->ParError(1) <<endl;
+          else{
+              cout << "Error" << k << " " << nbins << " " << y-x << endl;
+              k++;
+          }
+          //cout << "Vita media: " << func->GetParameter(1) << " microsec ± " <<  r->ParError(1) <<endl;
           // cout << "errore percentuale: " << r->ParError(1)/func->GetParameter(1) * 100 << endl;
           // double tau = 2.1969811;
           // double t = abs(tau-func->GetParameter(1))/r->ParError(1);
@@ -126,7 +147,8 @@ int main(int argc, char** argv)
 
 
 
-  myfile.close();
+  tau.close();
+  chi.close();
 
 
   // stringstream s;
