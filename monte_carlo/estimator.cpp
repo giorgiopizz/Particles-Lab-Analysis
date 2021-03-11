@@ -30,14 +30,11 @@ using namespace std;
 void histo_populate(TH1F * h, int n_tot, double tau){
     TRandom3 * r = new TRandom3();
     // double width = (max-min)/bin;
-    int j = 0;
     for(int i=0;i<n_tot;i++){
         // nu = n_tot * func->Integrate(min+i*width,min+(i+1)*width);
         // h->Fill(r->Poisson(nu));
-        j++;
         h->Fill(r->Exp(tau));
     }
-    //cout << "J: " << j << endl;
 }
 
 int main(int argc, char** argv)
