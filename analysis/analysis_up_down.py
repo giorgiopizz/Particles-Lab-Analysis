@@ -2,8 +2,12 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 from sys import argv
+from os import rename
 from math import ceil
 import multiprocessing
+
+from file_conversion import convert, merge
+
 import os,sys,inspect
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)+"/lib"
@@ -46,8 +50,45 @@ if __name__ == "__main__":
             for i in tempi_down:
                 file.write(str(i)+"\n")
 
+        convert(argv[3]+'_up')
+        convert(argv[3]+'_down')
+
+        # current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        # parent_dir = os.path.dirname(current_dir)+"/tempi"
+        # print(parent_dir)
+        merge(argv[3]+'_up_corr', argv[3]+'_down_corr', argv[3]+'_tot')
 
 
+        if 'tempi' in os.listdir():
+            try:
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+            except:
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+
+        else:
+            parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+            try:
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+            except:
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+
+
+        os.remove(argv[3]+'_up.txt')
+        os.remove(argv[3]+'_down.txt')
 
 
     elif argv[1] == '-xml':
