@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 
     cnv->Modified();
     cnv->Update();
-
+    cnv->SaveAs("images/pull.png");
     myApp->Run();
 
 }

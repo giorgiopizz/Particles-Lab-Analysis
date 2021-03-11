@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     h->Fit(func2);
     cnv->Modified();
     cnv->Update();
-
+    cnv->SaveAs("images/tau_MC.png");
 
     TCanvas* cnv1 = new TCanvas("myC2","myC2",10,10,1200,800);
     gStyle->SetOptFit(1111);
@@ -121,5 +121,6 @@ int main(int argc, char** argv)
     h1->Fit(func2);
     cnv1->Modified();
     cnv1->Update();
+    cnv1->SaveAs("images/chi_MC.png");
     myApp->Run();
 }
