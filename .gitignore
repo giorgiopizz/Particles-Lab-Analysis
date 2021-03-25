@@ -1,0 +1,4 @@
+immagini
+*.db
+.DS_STORE
+__pycache__

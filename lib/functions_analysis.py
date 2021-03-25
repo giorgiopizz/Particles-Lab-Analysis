@@ -205,7 +205,9 @@ def up_or_down(signals, tempi_up, tempi_down):
                 if len(real_pulses1) == 2:
                     #up decay
                     time_diff = real_pulses1[1]-real_pulses1[0]
-                    tempi_up.append(time_diff)
+                    if time_diff>20:
+                        # we don't want double square with a gap under 80ns
+                        tempi_up.append(time_diff)
                 elif len(real_pulses1)==1 and len(real_pulses2)==1 and real_pulses1[0]<real_pulses2[0]:
                     #down decay
                     time_diff = real_pulses2[0]-real_pulses1[0]
