@@ -12,9 +12,12 @@ import os,sys,inspect
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)+"/lib"
 sys.path.insert(0, parent_dir)
-import DT5751read as dt
-from functions_analysis import db_analysis_up_down, up_or_down, ch_max
 
+import DT5751read as dt
+
+from functions_analysis import db_analysis_up_down, up_or_down, ch_max
+from experimentDuration import experimentDuration
+from configParser import createConfig
 
 if __name__ == "__main__":
 
@@ -89,6 +92,18 @@ if __name__ == "__main__":
 
         os.remove(argv[3]+'_up.txt')
         os.remove(argv[3]+'_down.txt')
+
+        expDur = experimentDuration(argv[2])
+        print(f'Experiment duration: {expDur}')
+
+        # usually argv[3] is tempi_cerbero_mezzo_...
+        configName = '_'.join(argv[3].split('_')[1:])
+        
+        l = ['up', 'down','tot']
+        for suffix in l:
+            cfgName = configName + '_' + suffix
+            createConfig(cfgName, os.path.join(parent_dir, 'tempi', argv[3]+'_'+ suffix +'.txt'), 'Carbon ' + suffix.capitalize() + ' Decay')
+
 
 
     elif argv[1] == '-xml':
