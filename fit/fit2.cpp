@@ -58,6 +58,7 @@ int main(int argc, char** argv)
 
 
         TCanvas* cnv = new TCanvas("myC1","myC1",10,10,1200,800);
+        gStyle->SetOptStat(11);
         gStyle->SetOptFit(1111);
         //TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])",0.5, 10);
         TF1 * func;
@@ -81,11 +82,21 @@ int main(int argc, char** argv)
         // func->SetParameter(3, pos_tau);
         // func->SetParLimits(3, pos_tau-pos_tau*0.05,pos_tau+pos_tau*0.05);
         // func->SetParameter(4, 386);
-
+        vector<string>  names;
+        string n1[] = {"N", "\\tau_{\\mu}", "Bkg"};
+        string n2[] = {"N_{-}", "\\tau_{\\mu^-}","N_{+}", "\\tau_{\\mu^+}", "Bkg"};
+        if (function_type==1){
+            for (int i=0;i<3;i++)   names.push_back(n1[i]);
+            cout << "minor" <<endl;
+        }
+        else{
+            for (int i=0;i<5;i++)   names.push_back(n2[i]);
+        }
 
         for (int i=0; i<parameters.size(); i++) {
 
                 func->SetParameter(i, parameters[i]);
+                func->SetParName(i, names[i].c_str());
         }
 
         TH1F *h = new TH1F("h", "example histogram",bin,0,11);
