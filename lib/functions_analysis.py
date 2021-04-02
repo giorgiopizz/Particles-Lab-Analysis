@@ -85,13 +85,16 @@ def double_square(der):
             return []
 
     # time width of a square pulse
-    time_width = max(np.array(stop)-np.array(start))
+    #time_width = max(np.array(stop)-np.array(start))
+    time_width = np.mean(np.array(stop)-np.array(start))
+    print(time_width)
     pulses_start = []
     for i in range(len(start)):
 
         #lasso = stop[i]-start[i]
         if i>1 and stop[i-1]-start[i]<2*time_width:
             # there is a double square
+            print('buttato')
             pass
         else:
             pulses_start.append(start[i])
@@ -172,14 +175,14 @@ def check_signals(signals,tempi):
                 # fig1.savefig("immagini/plot_corretti_"+str(i)+".jpg")
     #plt.close()
 
-def plot(signals,i):
+def plot(signals,i,keep='tenuto'):
     der1 = delta(signals[0])
     der2 = delta(signals[1])
     interval = [min(minmax(der1)[0],minmax(der2)[0]),max(minmax(der1)[1],minmax(der2)[1])]
     fig1, ax1 = plt.subplots(1, 1, tight_layout=True)
     ax1.plot(np.arange(ch_max)[interval[0]:interval[1]],signals[0][interval[0]:interval[1]],label='Ch0')
     ax1.plot(np.arange(ch_max)[interval[0]:interval[1]],signals[1][interval[0]:interval[1]], label='Ch1')
-    ax1.set_title("Evento "+str(i))
+    ax1.set_title("Evento "+str(i)+" "+keep)
     ax1.set_xlabel("time")
     plt.legend()
     fig2, ax2 = plt.subplots()
@@ -187,8 +190,8 @@ def plot(signals,i):
     ax2.plot(np.arange(ch_max-1)[interval[0]:interval[1]],der1[interval[0]:interval[1]])
     ax2.plot(np.arange(ch_max-1)[interval[0]:interval[1]],der2[interval[0]:interval[1]])
     #plt.show()
-    fig1.savefig("immagini/plot_nuovi_"+str(i)+".jpg")
-    fig2.savefig("immagini/plot_nuovi_"+str(i)+"_der.jpg")
+    fig1.savefig("immagini/plot_nuovi_3_"+str(i)+".jpg")
+    fig2.savefig("immagini/plot_nuovi_3_"+str(i)+"_der.jpg")
     plt.cla()
     plt.clf()
     plt.close('all')
@@ -205,9 +208,25 @@ def up_or_down(signals, tempi_up, tempi_down):
                 if len(real_pulses1) == 2:
                     #up decay
                     time_diff = real_pulses1[1]-real_pulses1[0]
-                    if time_diff>20:
-                        # we don't want double square with a gap under 80ns
+                    # double_square_width is the min time separation between two up signals
+                    # a separation less than this value is a double square
+                    # first value in ns, result in digitized time unit
+                    # for cerbero above should be 100, for minosse above is sufficient 80 ns
+
+                    double_square_width = 100 / 4
+                    # we double check for double square, first with double_square we require the start of a pulse and
+                    # stop of the previous (in the same channel) to be separated in time more than the mean duration of
+                    # a square pulse. The with the below criteria we impose the start of the next pulse to be at a time
+                    # distance greater than 100 ns from the previous start
+                    #double_square_width = real
+                    if time_diff>double_square_width:
+                        # we don't want double square with a gap under 80ns, because this was a false trigger
+                        # i.e. the signal time width was so large that even a retarded start would overlap with the
+                        # stop signal (which was the same signal of the start)
+                        # look up for start and stop topology on the paper
                         tempi_up.append(time_diff)
+                    else:
+                        return 'double square'
                 elif len(real_pulses1)==1 and len(real_pulses2)==1 and real_pulses1[0]<real_pulses2[0]:
                     #down decay
                     time_diff = real_pulses2[0]-real_pulses1[0]
@@ -215,6 +234,11 @@ def up_or_down(signals, tempi_up, tempi_down):
 
                 else:
                     print("error")
+                return ''
+        else:
+            return 'too many pulses'
+    else:
+        return 'overlap'
 
 
 def db_analysis(filename, j, n_obs, tempi):
@@ -247,4 +271,24 @@ def db_analysis_up_down(filename, j, n_obs, tempi_up, tempi_down):
             signals.append(np.array(convert_samples(row[0])))
             up_or_down(signals, tempi_up, tempi_down)
 
+        i+=1
+def db_plot(filename, j, n_obs, tempi_up, tempi_down):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+    r = c.execute('SELECT samples FROM samples where event_id>? and event_id<?',(j*n_obs,(j+1)*n_obs+1))
+    i=0
+    for row in r:
+        #print(i)
+        if i%2==0:
+            signals=[np.array(convert_samples(row[0]))]
+
+        else:
+            print(i)
+            signals.append(np.array(convert_samples(row[0])))
+            init_len = len(tempi_up) + len(tempi_down)
+            p = up_or_down(signals, tempi_up, tempi_down)
+            if len(tempi_up) + len(tempi_down) == init_len:
+                plot(signals,i,'buttato '+p)
+            else:
+                plot(signals,i)
         i+=1
