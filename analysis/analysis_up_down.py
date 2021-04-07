@@ -103,7 +103,7 @@ if __name__ == "__main__":
         l = ['up', 'down','tot']
         for suffix in l:
             cfgName = configName + '_' + suffix
-            createConfig(cfgName, '../tempi' + argv[3] + '_' + suffix +'.txt' , 'Carbon ' + suffix.capitalize() + ' Decay')
+            createConfig(cfgName, '../tempi/' + argv[3] + '_' + suffix +'.txt' , 'Carbon ' + suffix.capitalize() + ' Decay')
 
 
 

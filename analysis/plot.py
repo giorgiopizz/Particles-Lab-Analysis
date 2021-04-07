@@ -24,23 +24,30 @@ if __name__ == "__main__":
         conn = sqlite3.connect(argv[2])
         c = conn.cursor()
 
-        n_obs = 2400
-        # lenght = c.execute('SELECT COUNT(*) from events').fetchone()
-        lenght = [1]
-        print(lenght[0])
-        reps = ceil(lenght[0]/n_obs)
-        print(reps)
-        # WITH multiprocessing
-        jobs = []
-        manager = multiprocessing.Manager()
-        tempi_up = manager.list()
-        tempi_down = manager.list()
-        for k in range(reps):
-            p = multiprocessing.Process(target=db_plot, args=(argv[2], k, n_obs, tempi_up, tempi_down))
-            jobs.append(p)
-            p.start()
-        for proc in jobs:
-            proc.join()
+        # n_obs = 2400
+        # # lenght = c.execute('SELECT COUNT(*) from events').fetchone()
+        # lenght = [1]
+        # print(lenght[0])
+        # reps = ceil(lenght[0]/n_obs)
+        # print(reps)
+        # # WITH multiprocessing
+        # jobs = []
+        # manager = multiprocessing.Manager()
+        # tempi_up = manager.list()
+        # tempi_down = manager.list()
+        # for k in range(reps):
+        #     p = multiprocessing.Process(target=db_plot, args=(argv[2], k, n_obs, tempi_up, tempi_down))
+        #     jobs.append(p)
+        #     p.start()
+        # for proc in jobs:
+        #     proc.join()
+
+
+        tempi_up = []
+        tempi_down = []
+        db_plot(argv[2], 27, 2000, tempi_up, tempi_down, 3463 )
+
+
         print(tempi_up)
         print("##########")
         print(tempi_down)
