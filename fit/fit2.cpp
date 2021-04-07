@@ -34,7 +34,7 @@ string trimTitle (const string & title){
 int main(int argc, char** argv)
 {
         //char config_file[] = argv[1];
-        char config_file[] = "../fit.cfg";
+        char config_file[] = "fit.cfg";
         CfgParser * gConfigParser = new CfgParser (config_file);
         string name = gConfigParser->readStringOpt("general::name");
 

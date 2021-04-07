@@ -24,8 +24,9 @@ if __name__ == "__main__":
         conn = sqlite3.connect(argv[2])
         c = conn.cursor()
 
-        n_obs = 2000
-        lenght = c.execute('SELECT COUNT(*) from events').fetchone()
+        n_obs = 2400
+        # lenght = c.execute('SELECT COUNT(*) from events').fetchone()
+        lenght = [1]
         print(lenght[0])
         reps = ceil(lenght[0]/n_obs)
         print(reps)

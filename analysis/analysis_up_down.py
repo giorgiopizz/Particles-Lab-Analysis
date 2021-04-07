@@ -27,6 +27,7 @@ if __name__ == "__main__":
 
         n_obs = 2000
         lenght = c.execute('SELECT COUNT(*) from events').fetchone()
+        # lenght = [10]
         print(lenght[0])
         reps = ceil(lenght[0]/n_obs)
         print(reps)
@@ -98,11 +99,11 @@ if __name__ == "__main__":
 
         # usually argv[3] is tempi_cerbero_mezzo_...
         configName = '_'.join(argv[3].split('_')[1:])
-        
+
         l = ['up', 'down','tot']
         for suffix in l:
             cfgName = configName + '_' + suffix
-            createConfig(cfgName, os.path.join(parent_dir, 'tempi', argv[3]+'_'+ suffix +'.txt'), 'Carbon ' + suffix.capitalize() + ' Decay')
+            createConfig(cfgName, '../tempi' + argv[3] + '_' + suffix +'.txt' , 'Carbon ' + suffix.capitalize() + ' Decay')
 
 
 

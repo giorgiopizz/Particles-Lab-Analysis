@@ -75,7 +75,7 @@ def double_square(der):
     # start e stop della quadra
     start = start_impulso(der)
     stop = start_impulso(der*(-1))
-
+    # print(start, stop)
     if len(start)!=len(stop) or len(start)==0:
         # non è una doppia ma va scartata perché ci siamo persi o uno start o uno stop
         return []
@@ -87,17 +87,18 @@ def double_square(der):
     # time width of a square pulse
     #time_width = max(np.array(stop)-np.array(start))
     time_width = np.mean(np.array(stop)-np.array(start))
-    print(time_width)
+    # print(time_width)
     pulses_start = []
     for i in range(len(start)):
 
         #lasso = stop[i]-start[i]
-        if i>1 and stop[i-1]-start[i]<2*time_width:
+        if i>=1 and stop[i-1]-start[i]<2*time_width:
             # there is a double square
-            print('buttato')
+            #print('buttato')
             pass
         else:
             pulses_start.append(start[i])
+    # print(pulses_start)
     return pulses_start
 
 
@@ -234,6 +235,7 @@ def up_or_down(signals, tempi_up, tempi_down):
 
                 else:
                     print("error")
+                    print(real_pulses1, real_pulses2)
                 return ''
         else:
             return 'too many pulses'
@@ -279,16 +281,28 @@ def db_plot(filename, j, n_obs, tempi_up, tempi_down):
     i=0
     for row in r:
         #print(i)
-        if i%2==0:
-            signals=[np.array(convert_samples(row[0]))]
+        if i>=2400 and i<2402:
+            if i%2==0:
+                signals=[np.array(convert_samples(row[0]))]
 
-        else:
-            print(i)
-            signals.append(np.array(convert_samples(row[0])))
-            init_len = len(tempi_up) + len(tempi_down)
-            p = up_or_down(signals, tempi_up, tempi_down)
-            if len(tempi_up) + len(tempi_down) == init_len:
-                plot(signals,i,'buttato '+p)
             else:
-                plot(signals,i)
+                #print(i)
+                signals.append(np.array(convert_samples(row[0])))
+                init_len = len(tempi_up) + len(tempi_down)
+                p = up_or_down(signals, tempi_up, tempi_down)
+                if len(tempi_up) + len(tempi_down) == init_len:
+                    plot(signals,i,'buttato '+p)
+                else:
+                    plot(signals,i)
+
+                    # if i%2==0:
+                    #     signals=[np.array(convert_samples(row[0]))]
+                    #
+                    #     signals.append(np.array(convert_samples(row[0])))
+                    #     init_len = len(tempi_up) + len(tempi_down)
+                    #     p = up_or_down(signals, tempi_up, tempi_down)
+                    #     if len(tempi_up) + len(tempi_down) == init_len:
+                    #         plot(signals,i,'buttato '+p)
+                    #     else:
+                    #         plot(signals,i)
         i+=1

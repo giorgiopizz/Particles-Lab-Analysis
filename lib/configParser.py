@@ -1,4 +1,9 @@
 import configparser
+from sys import argv
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+lib_dir = parent_dir + "/lib"
 
 def createConfig (configName, file, plotTitle):
     """ retrieves the config file in the parent folder,
@@ -16,30 +21,48 @@ def createConfig (configName, file, plotTitle):
     # bin= 100
     # search=1
     config = configparser.ConfigParser()
-    config.read('../fit.cfg')
 
-    config['general']['name'] = configName
+    if 'fit.cfg' in os.listdir():
+        configFilename = parent_dir+'/fit.cfg'
 
-    configObj[configName] = dict(configObj['example']).copy()
-    configObj[configName]['filename'] = file
-    configObj[configName]['title'] = plotTitle
+        config.read(configFilename)
 
-    with open('../fit.cfg', 'w') as configfile:
-        config.write(configfile)
+
+        config['general']['name'] = configName
+
+        config[configName] = dict(config['example']).copy()
+        config[configName]['filename'] = file
+        config[configName]['title'] = plotTitle
+
+        with open(configFilename, 'w') as configfile:
+            config.write(configfile)
+    else:
+        print("can't find fit.cfg")
 
 
 
 if __name__ == "__main__":
-    config = configparser.ConfigParser()
-    config.read('../fit.cfg')
+    if len(argv)<=1:
+        print('error')
+    else:
+        configName = '_'.join(argv[1].split('_')[1:])
 
-    print(config.sections())
-    for key in config['general']:
-        print(key)
-        print(config['general'][key])
+        l = ['up', 'down','tot']
+        for suffix in l:
+            cfgName = configName + '_' + suffix
+            createConfig(cfgName, os.path.join(parent_dir, 'tempi', argv[1]+'_'+ suffix +'.txt'), 'Carbon ' + suffix.capitalize() + ' Decay')
 
-    print(dict(config['general']))
-    createConfig('prova', 'cioaiodi.txt', 'Io')
 
-    with open('../fit.cfg', 'w') as configfile:
-        config.write(configfile)
+    # config = configparser.ConfigParser()
+    # config.read('../fit.cfg')
+    #
+    # print(config.sections())
+    # for key in config['general']:
+    #     print(key)
+    #     print(config['general'][key])
+    #
+    # print(dict(config['general']))
+    # createConfig('prova', 'cioaiodi.txt', 'Io')
+    #
+    # with open('../fit.cfg', 'w') as configfile:
+    #     config.write(configfile)
