@@ -100,6 +100,10 @@ int main(int argc, char** argv)
         }
 
         TH1F *h = new TH1F("h", "example histogram",bin,0,11);
+        cnv->SetGridx();
+        cnv->SetGridy();
+        h->GetYaxis()->SetTitle("Counts");
+        h->GetXaxis()->SetTitle("#Delta (t)[#mu s]");
         ifstream inp;
         double x;
         inp.open(filename);

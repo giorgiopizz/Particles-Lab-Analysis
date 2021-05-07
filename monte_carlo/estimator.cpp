@@ -1,5 +1,8 @@
 /*
 c++ -o estimator estimator.cpp `root-config --cflags --glibs`
+
+mu:2.10751
+std:0.0109906
 */
 
 
@@ -24,7 +27,7 @@ c++ -o estimator estimator.cpp `root-config --cflags --glibs`
 
 using namespace std;
 
-double time_offset = 0.300;
+double time_offset = 0.000;
 
 
 void histo_populate(TH1F * h, int n_tot, double tau){
@@ -66,15 +69,15 @@ int main(int argc, char** argv)
 
     std::vector<double> tau;
     std::vector<double> chi_square;
-    int experiments = 10000;
-    int counts = 20000;
+    int experiments = 100000;
+    int counts = 5000;
 
     TRandom3 * r = new TRandom3();
     int n = r->Poisson(counts);
 
-    TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])",0.05+time_offset, 11);
+    TF1 * func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1])",0.0+time_offset, 11);
     func->SetParameter(0,counts/2);
-    func->SetParameter(1,2.2);
+    func->SetParameter(1,2.1);
     // func->SetParameter(2,2.2);
     // func->SetParLimits(2,0.0,100);
 
@@ -91,7 +94,7 @@ int main(int argc, char** argv)
         // in a single experiment we populate an histogram with the histo_populate
         // method, we then fit this histogram in order to estimate tau,
         double min=0, max=11;
-        int bin = 70;
+        int bin = 20;
         TH1F *h = new TH1F("h", "example histogram",bin,min,max);
 
 

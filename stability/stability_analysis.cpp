@@ -95,14 +95,14 @@ int main(int argc, char** argv)
    hsurf->Draw("surf1");
    c2->Modified();
    c2->Update();
-   c2->SaveAs(("images/tau_3d"+name+".png").c_str());
+   c2->SaveAs(("images/tau_3d_"+name+".png").c_str());
 
    TCanvas *c3 = new TCanvas("c3","c3",1200,800);
    c3->cd();
    hsurf->Draw("colz");
    c3->Modified();
    c3->Update();
-   c3->SaveAs(("images/tau_2d"+name+".png").c_str());
+   c3->SaveAs(("images/tau_2d_"+name+".png").c_str());
    // stability_chi_square
 
    TH2F *hsurf2 = new TH2F("hsurf2","Chi2/Ndf",x_bins,x_min,x_max,y_bins,y_min,y_max);
@@ -126,14 +126,14 @@ int main(int argc, char** argv)
    hsurf2->Draw("surf1");
    c4->Modified();
    c4->Update();
-   c4->SaveAs(("images/chi_3d"+name+".png").c_str());
+   c4->SaveAs(("images/chi_3d_"+name+".png").c_str());
    TCanvas *c5 = new TCanvas("c5","c5",1200,800);
    c5->cd();
    gStyle->SetPalette(1);
    hsurf2->Draw("colz");
    c5->Modified();
    c5->Update();
-   c5->SaveAs(("images/chi_2d"+name+".png").c_str());
+   c5->SaveAs(("images/chi_2d_"+name+".png").c_str());
 
    myApp->Run();
 }

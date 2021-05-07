@@ -1,0 +1,3 @@
+Vita media: 2.15037 microsec ± 0.0602085
+errore percentuale: 2.79992
+t: 0.774208

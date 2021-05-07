@@ -1,0 +1,4 @@
+Unico fit decente è il down decay per cui si ottiene:
+Vita media: 2.11312 microsec ± 0.040444
+errore percentuale: 1.91395
+t: 2.0736

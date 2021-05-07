@@ -1,5 +1,5 @@
 from sys import argv
-
+import os
 
 def convert(filename):
         l = []
@@ -49,11 +49,28 @@ def merge(filename1, filename2, filenameTot):
     with open(filenameTot+".txt", "w+") as file_t:
         for i in l:
             file_t.write(i)
+if len(argv)>1:
+    if argv[1] == '-c':
 
-if argv[1] == '-c':
+        convert(argv[2])
 
-    convert(argv[2])
+    elif argv[1] == '-m':
 
-elif argv[1] == '-m':
+        merge(argv[2], argv[3], argv[4])
 
-    merge(argv[2], argv[3], argv[4])
+else:
+    # conversion of big initial analysis
+    s = "tempi_cerbero_sopra_iniziali"
+    prefix = "tempi/"
+    suffixes = ['up', 'down', 'tot']
+    for suffix in suffixes:
+        for i in range(3):
+            if i==0:
+                first_file = prefix + s + "_CORR_" + suffix
+            else:
+                first_file = "tmp_" + str(i)
+            second_file = prefix + s + "_" + str(i+2) + "_CORR_" + suffix
+            #merge(first_file, second_file, "tmp"+str(i+1))
+            merge(first_file, second_file, "tmp_"+str(i+1))
+            if i==2:
+                os.rename(os.path.join(os.getcwd(),"tmp_"+str(i+1)+".txt"), os.path.join(os.getcwd(), 'tempi', s + "_merged_" + suffix + ".txt") )

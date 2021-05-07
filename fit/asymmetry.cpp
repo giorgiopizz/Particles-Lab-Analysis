@@ -137,7 +137,7 @@ int main(int argc, char** argv)
             down = h_down->GetBinContent(i);
             if (up+down!=0){
                 y_axis[i] = (up-down)/(up+down);
-                y_error[i] = sqrt(4*up*down/pow((up+down),3));
+                y_error[i] = 2*sqrt(up*down)*sqrt(pow(up,2)+pow(down,2))/pow((up+down),2));
             }
             else y_axis[i] = 0;
         }

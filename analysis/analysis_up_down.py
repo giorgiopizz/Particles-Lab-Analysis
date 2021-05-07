@@ -25,7 +25,7 @@ if __name__ == "__main__":
         conn = sqlite3.connect(argv[2])
         c = conn.cursor()
 
-        n_obs = 2000
+        n_obs = 8000
         lenght = c.execute('SELECT COUNT(*) from events').fetchone()
         # lenght = [10]
         print(lenght[0])
@@ -113,11 +113,14 @@ if __name__ == "__main__":
         evento = data.get()
         tempi_up = []
         tempi_down = []
+        i=0
         while(evento):
 
             signals = [np.array(evento['channels'][0][:ch_max]),np.array(evento['channels'][1][:ch_max])]
-            up_or_down(signals, tempi_up, tempi_down)
+            up_or_down(signals, tempi_up, tempi_down, i, 0)
             evento = data.get()
+            i+=1
+
 
         with open(argv[3]+'_up.txt', 'w') as file:
             for i in tempi_up:
@@ -125,3 +128,51 @@ if __name__ == "__main__":
         with open(argv[3]+'_down.txt', 'w') as file:
             for i in tempi_down:
                 file.write(str(i)+"\n")
+
+
+        convert(argv[3]+'_up')
+        convert(argv[3]+'_down')
+
+        # current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        # parent_dir = os.path.dirname(current_dir)+"/tempi"
+        # print(parent_dir)
+        merge(argv[3]+'_up_corr', argv[3]+'_down_corr', argv[3]+'_tot')
+
+
+        if 'tempi' in os.listdir():
+            try:
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+            except:
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.remove(os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(os.getcwd(), 'tempi', argv[3]+'_tot.txt'))
+
+        else:
+            parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+            try:
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+            except:
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.remove(os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_up_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_up.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_down_corr.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_down.txt'))
+                os.rename(os.path.join(os.getcwd(),argv[3]+'_tot.txt'), os.path.join(parent_dir, 'tempi', argv[3]+'_tot.txt'))
+
+
+        os.remove(argv[3]+'_up.txt')
+        os.remove(argv[3]+'_down.txt')
+
+        configName = '_'.join(argv[3].split('_')[1:])
+
+        l = ['up', 'down','tot']
+        for suffix in l:
+            cfgName = configName + '_' + suffix
+            createConfig(cfgName, '../tempi/' + argv[3] + '_' + suffix +'.txt' , 'Carbon ' + suffix.capitalize() + ' Decay')

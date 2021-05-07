@@ -1,0 +1,7 @@
+Stability analysis for cerbero_mezzo_tot_down with cuts:
+cuts on x: 0.6, 1.4
+cuts on bins: 90, 140
+Min tau: 2.18002
+Max tau: 2.01649
+Mean: 2.11107
+Std: 0.0468029
