@@ -25,7 +25,7 @@ if __name__ == "__main__":
         conn = sqlite3.connect(argv[2])
         c = conn.cursor()
 
-        n_obs = 8000
+        n_obs = 2000
         lenght = c.execute('SELECT COUNT(*) from events').fetchone()
         # lenght = [10]
         print(lenght[0])

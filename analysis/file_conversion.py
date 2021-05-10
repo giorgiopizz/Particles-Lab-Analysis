@@ -58,19 +58,19 @@ if len(argv)>1:
 
         merge(argv[2], argv[3], argv[4])
 
-else:
-    # conversion of big initial analysis
-    s = "tempi_cerbero_sopra_iniziali"
-    prefix = "tempi/"
-    suffixes = ['up', 'down', 'tot']
-    for suffix in suffixes:
-        for i in range(3):
-            if i==0:
-                first_file = prefix + s + "_CORR_" + suffix
-            else:
-                first_file = "tmp_" + str(i)
-            second_file = prefix + s + "_" + str(i+2) + "_CORR_" + suffix
-            #merge(first_file, second_file, "tmp"+str(i+1))
-            merge(first_file, second_file, "tmp_"+str(i+1))
-            if i==2:
-                os.rename(os.path.join(os.getcwd(),"tmp_"+str(i+1)+".txt"), os.path.join(os.getcwd(), 'tempi', s + "_merged_" + suffix + ".txt") )
+# else:
+#     # conversion of big initial analysis
+#     s = "tempi_cerbero_sopra_iniziali"
+#     prefix = "tempi/"
+#     suffixes = ['up', 'down', 'tot']
+#     for suffix in suffixes:
+#         for i in range(3):
+#             if i==0:
+#                 first_file = prefix + s + "_CORR_" + suffix
+#             else:
+#                 first_file = "tmp_" + str(i)
+#             second_file = prefix + s + "_" + str(i+2) + "_CORR_" + suffix
+#             #merge(first_file, second_file, "tmp"+str(i+1))
+#             merge(first_file, second_file, "tmp_"+str(i+1))
+#             if i==2:
+#                 os.rename(os.path.join(os.getcwd(),"tmp_"+str(i+1)+".txt"), os.path.join(os.getcwd(), 'tempi', s + "_merged_" + suffix + ".txt") )
