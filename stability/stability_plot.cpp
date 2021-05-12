@@ -112,6 +112,12 @@ int main(int argc, char** argv)
    //    hsurf->Fill(px-1,5*py);
    //    hsurf->Fill(2+0.5*px,2*py-10.,0.1);
    // }
+   if (name == "cerbero_sopra_new_CORR_down_two_exp"){
+       int search = gConfigParser->readIntOpt(name + "::search");
+       if (search==1) name += "_muminus";
+       else name += "_muplus";
+   }
+
    TCanvas *c2 = new TCanvas("c2","c2",1200,800);
    c2->cd();
    gStyle->SetPalette(1);

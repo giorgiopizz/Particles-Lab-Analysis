@@ -139,13 +139,17 @@ int main(int argc, char** argv)
    std::vector<double> taus;
    while(!(tau >> i >> j >> z)==0){
        // cout << x << endl;
-       x = x_start + i*x_step;
-       bins = bins_start + j*bins_step;
+       // x = x_start + i*x_step;
+       // bins = bins_start + j*bins_step;
+       x = hsurf->GetXaxis()->GetBinCenter(i);
+       bins = hsurf->GetYaxis()->GetBinCenter(j);
+       // cout <<  x << " " << bins << endl;
        if ((x>=cuts_x_min && x<=cuts_x_max) && (bins>=cuts_bins_min && bins<=cuts_bins_max)){
+           // cout << "inside" << endl;
            // if (z > tau_max) tau_max = z;
            // if (z < tau_min) tau_min = z;
            taus.push_back(z);
-           hsurf->SetBinContent(i+1,j+1,z);
+           hsurf->SetBinContent(i,j,z);
        }
    }
    // cout << "lenght of taus" << taus.size() << endl;
@@ -175,6 +179,11 @@ int main(int argc, char** argv)
    hsurf->Draw("colz");
    c3->Modified();
    c3->Update();
+   if (name == "cerbero_sopra_new_CORR_down_two_exp"){
+       int search = gConfigParser->readIntOpt(name + "::search");
+       if (search==1) name += "_muminus";
+       else name += "_muplus";
+   }
    c3->SaveAs(("images/tau_2d_zoomed_"+name+".png").c_str());
    // stability_chi_square
    //

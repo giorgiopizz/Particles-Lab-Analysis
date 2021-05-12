@@ -111,27 +111,87 @@ int main(int argc, char** argv)
         cnv->cd();
         h->Draw();
 
-        TFitResultPtr r = h->Fit("fun","SR");
+        if (name == "cerbero_sopra_new_CORR_down_two_exp"){
+            func->FixParameter(1, 2.026);
+            func->FixParameter(3, 2.197);
+            h->Fit("fun","R");
+            func->ReleaseParameter(1);
+            func->ReleaseParameter(3);
+            func->FixParameter(0, func->GetParameter(0));
+            func->FixParameter(1, func->GetParameter(1));
+            func->SetParameter(2, func->GetParameter(2));
+            func->SetParameter(3, func->GetParameter(3));
+            func->FixParameter(4, func->GetParameter(4));
+            TFitResultPtr r = h->Fit("fun","SR");
+            h->SetTitle((title + "mu+").c_str());
+            cnv->Modified();
+            cnv->Update();
 
-        double tot = func->GetParameter(0)+func->GetParameter(2);
-        double prop = func->GetParameter(0)/tot*100;
-        cout << "proprorzioni:\nneg: " << prop << "\npos: " << 100-prop <<endl;
+            if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muplus.png").c_str(), "png");
+            double n_plus =  func->GetParameter(2);
+            double tau_plus = func->GetParameter(3);
+            double n_plus_err = r->ParError(2);
+            double tau_plus_err = r->ParError(3);
 
-        cout << "Vita media: " << func->GetParameter(1) << " microsec ± " <<  r->ParError(1) <<endl;
-        cout << "errore percentuale: " << r->ParError(1)/func->GetParameter(1) * 100 << endl;
-        double tau = 2.1969811;
-        double t = abs(tau-func->GetParameter(1))/r->ParError(1);
-        cout << "t: " << t <<endl;
+
+
+            func->ReleaseParameter(0);
+            func->ReleaseParameter(1);
+
+
+            func->SetParameter(0, func->GetParameter(0));
+            func->SetParameter(1, func->GetParameter(1));
+            func->FixParameter(2, func->GetParameter(2));
+            func->FixParameter(3, func->GetParameter(3));
+            r = h->Fit("fun","SR");
+            h->SetTitle((title + "mu-").c_str());
+            cnv->Modified();
+            cnv->Update();
+
+            if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muminus.png").c_str(), "png");
+
+
+            double n_minus =  func->GetParameter(0);
+            double tau_minus = func->GetParameter(1);
+            double n_minus_err = r->ParError(0);
+            double tau_minus_err = r->ParError(1);
+
+
+            cout << "N + ricavato: " << n_plus << " ± " << n_plus_err <<endl;
+            cout << "tau + ricavato: " << tau_plus << " ± " << tau_plus_err <<endl;
+
+            cout << "N - ricavato: " << n_minus << " ± " << n_minus_err <<endl;
+            cout << "tau - ricavato: " << tau_minus << " ± " << tau_minus_err <<endl;
+
+            // cout << "N - ricavato: " << func->GetParameter(0) <<endl;
+            // cout << "tau - ricavato: " << func->GetParameter(1) <<endl;
+        }
+        else{
+            TFitResultPtr r = h->Fit("fun","SR");
+
+            double tot = func->GetParameter(0)+func->GetParameter(2);
+            double prop = func->GetParameter(0)/tot*100;
+            cout << "proprorzioni:\nneg: " << prop << "\npos: " << 100-prop <<endl;
+
+            cout << "Vita media: " << func->GetParameter(1) << " microsec ± " <<  r->ParError(1) <<endl;
+            cout << "errore percentuale: " << r->ParError(1)/func->GetParameter(1) * 100 << endl;
+            double tau = 2.1969811;
+            double t = abs(tau-func->GetParameter(1))/r->ParError(1);
+            cout << "t: " << t <<endl;
+
+            h->SetTitle(title.c_str());
+            cnv->Modified();
+            cnv->Update();
+
+            if (save == 1) cnv->Print(("images/"+trimTitle(title)+".png").c_str(), "png");
+
+        }
 
         /*stringstream s;
         s << "Vita media: " << round(func->GetParameter(1)*1000)/1000 << " +/- " <<  round(r->ParError(1)*1000)/1000 << " microsec. t: " << round(t*1000)/1000;
         h->SetTitle(s.str().c_str());
         */
-        h->SetTitle(title.c_str());
-        cnv->Modified();
-        cnv->Update();
 
-        if (save == 1) cnv->Print(("images/"+trimTitle(title)+".png").c_str(), "png");
         myApp->Run();
         return 0;
 }

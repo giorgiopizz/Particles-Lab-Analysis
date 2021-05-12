@@ -1,0 +1,7 @@
+Stability analysis for cerbero_sopra_new_CORR_down with cuts:
+cuts on x: 0.4, 1.2
+cuts on bins: 100, 200
+Min tau: 2.15765
+Max tau: 2.10323
+Mean: 2.1272
+Std: 0.0108045

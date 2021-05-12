@@ -1,0 +1,4 @@
+N + ricavato: 606.716 ± 14.8826
+tau + ricavato: 2.19852 ± 0.0393003
+N - ricavato: 2.0228 ± 16.3346
+tau - ricavato: 2.0228 ± 0.039282
