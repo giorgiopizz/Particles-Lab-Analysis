@@ -127,7 +127,7 @@ int main(int argc, char** argv)
 
       for (int l=0; l<parameters.size(); l++) {
           if (name != "cerbero_sopra_new_CORR_down_two_exp"){
-              if(fix && l==4){
+              if(fix && l==3){
                   func->FixParameter(l, parameters[l]);
                   func->SetParName(l, names[l].c_str());
               }

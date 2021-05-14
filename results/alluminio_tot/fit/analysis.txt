@@ -1,2 +1,5 @@
-Vita media: 0.821171 microsec ± 0.271534
-errore percentuale: 33.0667
+proprorzioni:
+neg: 37.219
+pos: 62.781
+Vita media: 0.780261 microsec ± 0.109215
+errore percentuale: 13.9973

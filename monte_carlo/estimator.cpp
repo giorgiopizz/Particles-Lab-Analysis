@@ -23,7 +23,8 @@ std:0.0109906
 #include "TMatrixDSym.h"
 #include "TMath.h"
 #include "TRandom3.h"
-#include <bits/stdc++.h>
+#include "TFile.h"
+// #include <bits/stdc++.h>
 
 using namespace std;
 
@@ -69,8 +70,8 @@ int main(int argc, char** argv)
 
     std::vector<double> tau;
     std::vector<double> chi_square;
-    int experiments = 10000;
-    int counts = 100000;
+    int experiments = 5000;
+    int counts = 25000;
     gStyle->SetOptStat(11);
     gStyle->SetOptFit(1111);
     TRandom3 * r = new TRandom3();
@@ -127,7 +128,7 @@ int main(int argc, char** argv)
 
 
         tau.push_back(result->Parameter(1));
-        chi_square.push_back(result->Chi2());
+        chi_square.push_back(result->Chi2()/result->Ndf());
 
         delete h;
         // cnv1->Modified();
@@ -144,7 +145,7 @@ int main(int argc, char** argv)
     gStyle->SetOptFit(1111);
     double min = *min_element(tau.begin(), tau.end());
     double max = *max_element(tau.begin(), tau.end());
-    TH1F *h = new TH1F("h", "tau_MC",50, min, max);
+    TH1F *h = new TH1F("h", "tau_MC",30, min, max);
 
     for(double t: tau)   h->Fill(t);
 
@@ -159,7 +160,7 @@ int main(int argc, char** argv)
     gStyle->SetOptFit(1111);
     double min1 = *min_element(chi_square.begin(), chi_square.end());
     double max1 = *max_element(chi_square.begin(), chi_square.end());
-    TH1F *h1 = new TH1F("h1", "chi_square",60, min1, max1);
+    TH1F *h1 = new TH1F("h1", "chi_square_reduced",100, min1, max1);
 
     for(double t: chi_square)   h1->Fill(t);
 
@@ -168,5 +169,9 @@ int main(int argc, char** argv)
     cnv1->Modified();
     cnv1->Update();
     cnv1->SaveAs("images/chi_MC.png");
+    TFile* outfile = TFile::Open("real_chi_reduced.root","recreate");
+    h->Write();
+	h1->Write();
+	outfile->Close();
     myApp->Run();
 }

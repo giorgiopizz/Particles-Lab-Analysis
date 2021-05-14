@@ -1,0 +1,4 @@
+differenza temporale tra i due scintillatori (1-2)
+min max    mean     std
+-8 36 18.742822482814397 3.241925806573855
+bisogna quindi correggere le diff. temp per asimmetria

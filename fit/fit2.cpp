@@ -46,7 +46,7 @@ int main(int argc, char** argv)
         string title = gConfigParser->readStringOpt(name+"::title");
 
         int save = gConfigParser->readIntOpt(name+"::save");
-
+        int fix = gConfigParser->readIntOpt(name+"::fix");
         vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters");
 
         vector<float> range = gConfigParser->readFloatListOpt (name+"::range");
@@ -93,10 +93,15 @@ int main(int argc, char** argv)
             for (int i=0;i<5;i++)   names.push_back(n2[i]);
         }
 
+
         for (int i=0; i<parameters.size(); i++) {
 
                 func->SetParameter(i, parameters[i]);
                 func->SetParName(i, names[i].c_str());
+        }
+
+        if (fix){
+            func->FixParameter(3, 2.197);
         }
 
         TH1F *h = new TH1F("h", "example histogram",bin,0,11);

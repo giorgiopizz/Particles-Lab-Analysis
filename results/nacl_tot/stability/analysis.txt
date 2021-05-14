@@ -1,7 +1,7 @@
 Stability analysis for cerbero_nacl_CORR_tot with cuts:
-cuts on x: 0.2, 0.35
-cuts on bins: 125, 180
-Min tau: 0.972762
-Max tau: 0.30372
-Mean: 0.601151
-Std: 0.15517
+cuts on x: 0.1, 0.35
+cuts on bins: 90, 198
+Min tau: 0.956511
+Max tau: 0.605539
+Mean: 0.764145
+Std: 0.077613

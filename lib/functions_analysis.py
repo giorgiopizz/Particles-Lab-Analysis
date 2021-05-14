@@ -11,6 +11,8 @@ def delta(arr1):
     return np.array(der)
 
 
+
+
 def minmax(derivata):
     condition =(derivata > 200) | (derivata<-200)
     start = ch_max
@@ -24,6 +26,9 @@ def minmax(derivata):
         return [start-20,stop+20]
     else:
         return [start,stop+20]
+
+
+
 
 
 def square_overlap(signals):
@@ -59,6 +64,7 @@ def intersect(signal, value):
 
 
 
+
 def start_impulso(der):
     # non mi piace la funzione sopra che identifica al posizione dello start dell'impulso
     # qui sfruttando la derivata guardo solo se la derivata supera un certo valore soglia val_th
@@ -66,6 +72,9 @@ def start_impulso(der):
     return intersect(der, val_th)
     #quindi quello che si fa è guardare quando derivata supera il valore soglia, appena lo supera si registra la posizione
     # appena invece si scende sotto la soglia bisogna resettare found
+
+
+
 
 
 
@@ -131,6 +140,9 @@ def convert_samples(sample):
     for i in sample.split(b' '):
         l.append(int(i.decode("utf-8")))
     return l
+
+
+
 
 
 def check_signals(signals,tempi):
@@ -246,6 +258,19 @@ def up_or_down(signals, tempi_up, tempi_down, i, j):
         return 'overlap'
 
 
+
+
+def sync(signals,tempi):
+    if square_overlap(signals):
+        der1 = delta(signals[0])
+        der2 = delta(signals[1])
+        interval = [min(minmax(der1)[0],minmax(der2)[0]),max(minmax(der1)[1],minmax(der2)[1])]
+
+        real_pulses1 = start_impulso(der1)
+        real_pulses2 = start_impulso(der2)
+        if (len(real_pulses1) == 1  and  len(real_pulses2) == 1):
+            tempi.append(real_pulses1[0]-real_pulses2[0])
+
 def db_analysis(filename, j, n_obs, tempi):
     conn = sqlite3.connect(filename)
     c = conn.cursor()
@@ -277,6 +302,24 @@ def db_analysis_up_down(filename, j, n_obs, tempi_up, tempi_down):
             up_or_down(signals, tempi_up, tempi_down, i, j)
 
         i+=1
+
+def sync_db(filename, j, n_obs, tempi):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+    r = c.execute('SELECT samples FROM samples where event_id>=? and event_id<?',(j*n_obs,(j+1)*n_obs))
+    i=0
+    for row in r:
+        #print(i)
+        if i%2==0:
+            signals=[np.array(convert_samples(row[0]))]
+
+        else:
+            signals.append(np.array(convert_samples(row[0])))
+            sync(signals, tempi)
+        i+=1
+
+
+
 def db_plot(filename, j, n_obs, tempi_up, tempi_down, theOne):
     conn = sqlite3.connect(filename)
     c = conn.cursor()
