@@ -69,6 +69,9 @@ int main(int argc, char** argv)
         else if(function_type==2){
             func = new TF1("fun", "[0]*TMath::Exp(-x[0]/[1]) +  [2]*TMath::Exp(-x[0]/[3])+ [4]",range[0], range[1]);
         }
+        else if(function_type==3){
+            func = new TF1("fun", "[0]*((1-[1])*TMath::Exp(-x[0]/[2]) +  [1]*TMath::Exp(-x[0]/[3])) + [4]",range[0], range[1]);
+        }
                 // double neg_muon = 5164*0.44;
         // double pos_muon = 5164*0.56;
         // double neg_tau = 2.005;
@@ -85,12 +88,16 @@ int main(int argc, char** argv)
         vector<string>  names;
         string n1[] = {"N", "\\tau_{\\mu}", "Bkg"};
         string n2[] = {"N_{-}", "\\tau_{\\mu^-}","N_{+}", "\\tau_{\\mu^+}", "Bkg"};
+        string n3[] = {"N","A", "\\tau_{\\mu^-}", "\\tau_{\\mu^+}", "Bkg"};
         if (function_type==1){
             for (int i=0;i<3;i++)   names.push_back(n1[i]);
             cout << "minor" <<endl;
         }
-        else{
+        else if (function_type==2){
             for (int i=0;i<5;i++)   names.push_back(n2[i]);
+        }
+        else if (function_type==3){
+            for (int i=0;i<5;i++)   names.push_back(n3[i]);
         }
 
 
@@ -117,38 +124,99 @@ int main(int argc, char** argv)
         h->Draw();
 
         if (name == "cerbero_sopra_new_CORR_down_two_exp"){
-            func->FixParameter(1, 2.026);
+
+            func->SetParameter(0, h->GetMaximum());
+            func->SetParLimits(0,h->GetMaximum()*0.8, h->GetMaximum()*1.2 );
+
+            func->SetParameter(1, 0.55);
+            func->SetParLimits(1, 0, 1);
+            func->SetParLimits(4, 0, 10000);
+            // for (int i=0;i<500;i++){
+            //     func->ReleaseParameter(0);
+            //     func->ReleaseParameter(1);
+            //     func->SetParLimits(1, 0, 1);
+            //     func->ReleaseParameter(2);
+            //     func->ReleaseParameter(3);
+            //
+            //
+            //     func->FixParameter(2, 2.026+(i-250)*0.004);
+            //     func->FixParameter(3, 2.197);
+            //
+            //     // func->SetParLimits(4,0,100000);
+            //     // func->FixParameter(1, 2.026);
+            //     // func->FixParameter(3, 2.197);
+            //
+            //     h->Fit("fun","RQ");
+            //     func->FixParameter(0, func->GetParameter(0));
+            //     func->FixParameter(4, func->GetParameter(4));
+            //
+            //     func->ReleaseParameter(2);
+            //     func->SetParLimits(2, 0, 3.1);
+            //
+            //     TFitResultPtr r = h->Fit("fun","SRQ");
+            //     double tau_minus = func->GetParameter(2);
+            //     cout << 2.026+(i-250)*0.004 << "\t" << tau_minus << endl;
+            // }
+            //
+            // func->ReleaseParameter(0);
+            // func->ReleaseParameter(1);
+            // func->SetParLimits(1, 0, 1);
+            // func->ReleaseParameter(2);
+            // func->ReleaseParameter(3);
+
+            func->SetParameter(1, 0.54);
+            func->SetParLimits(1, 0.50, 0.6);
+            func->SetParameter(2, 2.026);
+            func->SetParLimits(2, 0, 3.1);
             func->FixParameter(3, 2.197);
-            h->Fit("fun","R");
-            func->ReleaseParameter(1);
-            func->ReleaseParameter(3);
-            func->FixParameter(0, func->GetParameter(0));
-            func->FixParameter(1, func->GetParameter(1));
-            func->SetParameter(2, func->GetParameter(2));
-            func->SetParameter(3, func->GetParameter(3));
-            func->FixParameter(4, func->GetParameter(4));
+
+            // func->SetParLimits(4,0,100000);
+            // func->FixParameter(1, 2.026);
+            // func->FixParameter(3, 2.197);
+
+            // h->Fit("fun","RQ");
+            // func->FixParameter(0, func->GetParameter(0));
+            // func->FixParameter(4, func->GetParameter(4));
+            //
+            // func->ReleaseParameter(2);
+
+            // TFitResultPtr r = h->Fit("fun","SRQ");
+            // double tau_minus = func->GetParameter(2);
+            // cout << 2.026+(i-250)*0.004 << "\t" << tau_minus << endl;
+
+
+
+            // func->ReleaseParameter(1);
+            // // func->ReleaseParameter(3);
+            // func->FixParameter(0, func->GetParameter(0));
+            // // func->SetParameter(1, func->GetParameter(1));
+            // func->FixParameter(2, func->GetParameter(2));
+            // // func->SetParameter(3, func->GetParameter(3));
+            // func->FixParameter(4, func->GetParameter(4));
+            // // func->SetParLimits(0,0,100000);
+            // // func->SetParLimits(2,0,100000);
+            // // TFitResultPtr r = h->Fit("fun","SR");
+            // // h->SetTitle((title + "mu+").c_str());
+            // // cnv->Modified();
+            // // cnv->Update();
+            // //
+            // // if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muplus.png").c_str(), "png");
+            // // double n_plus =  func->GetParameter(2);
+            // // double tau_plus = func->GetParameter(3);
+            // // double n_plus_err = r->ParError(2);
+            // // double tau_plus_err = r->ParError(3);
+            //
+            //
+            //
+            // func->ReleaseParameter(0);
+            // // func->ReleaseParameter(2);
+            // func->ReleaseParameter(4);
+            //
+            // // func->SetParameter(0, func->GetParameter(0));
+            // // func->SetParameter(1, func->GetParameter(1));
+            // // func->SetParameter(2, func->GetParameter(2));
+            // // func->FixParameter(3, func->GetParameter(3));
             TFitResultPtr r = h->Fit("fun","SR");
-            h->SetTitle((title + "mu+").c_str());
-            cnv->Modified();
-            cnv->Update();
-
-            if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muplus.png").c_str(), "png");
-            double n_plus =  func->GetParameter(2);
-            double tau_plus = func->GetParameter(3);
-            double n_plus_err = r->ParError(2);
-            double tau_plus_err = r->ParError(3);
-
-
-
-            func->ReleaseParameter(0);
-            func->ReleaseParameter(1);
-
-
-            func->SetParameter(0, func->GetParameter(0));
-            func->SetParameter(1, func->GetParameter(1));
-            func->FixParameter(2, func->GetParameter(2));
-            func->FixParameter(3, func->GetParameter(3));
-            r = h->Fit("fun","SR");
             h->SetTitle((title + "mu-").c_str());
             cnv->Modified();
             cnv->Update();
@@ -162,8 +230,8 @@ int main(int argc, char** argv)
             double tau_minus_err = r->ParError(1);
 
 
-            cout << "N + ricavato: " << n_plus << " ± " << n_plus_err <<endl;
-            cout << "tau + ricavato: " << tau_plus << " ± " << tau_plus_err <<endl;
+            // cout << "N + ricavato: " << n_plus << " ± " << n_plus_err <<endl;
+            // cout << "tau + ricavato: " << tau_plus << " ± " << tau_plus_err <<endl;
 
             cout << "N - ricavato: " << n_minus << " ± " << n_minus_err <<endl;
             cout << "tau - ricavato: " << tau_minus << " ± " << tau_minus_err <<endl;

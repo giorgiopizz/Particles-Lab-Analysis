@@ -171,38 +171,50 @@ int main(int argc, char** argv)
           graph->GetYaxis()->SetTitle("Energies[KeV]");*/
 
           if (name == "cerbero_sopra_new_CORR_down_two_exp"){
+              func->SetParLimits(0,0,100000);
+              func->SetParLimits(2,0,100000);
+              func->SetParLimits(4,0,100000);
               func->FixParameter(1, 2.026);
               func->FixParameter(3, 2.197);
-              h->Fit("fun","RQ");
 
-
-              // func->ReleaseParameter(1);
-              func->ReleaseParameter(3);
-
+              h->Fit("fun","QR");
+              func->ReleaseParameter(1);
+              // func->ReleaseParameter(3);
               func->FixParameter(0, func->GetParameter(0));
-              // func->FixParameter(1, func->GetParameter(1));
-              func->SetParameter(2, func->GetParameter(2));
+              // func->SetParameter(1, func->GetParameter(1));
+              func->FixParameter(2, func->GetParameter(2));
               // func->SetParameter(3, func->GetParameter(3));
               func->FixParameter(4, func->GetParameter(4));
-              TFitResultPtr r = h->Fit("fun","SRQ");
+              // func->SetParLimits(0,0,100000);
+              // func->SetParLimits(2,0,100000);
+              // TFitResultPtr r = h->Fit("fun","SR");
+              // h->SetTitle((title + "mu+").c_str());
+              // cnv->Modified();
+              // cnv->Update();
+              //
+              // if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muplus.png").c_str(), "png");
+              // double n_plus =  func->GetParameter(2);
+              // double tau_plus = func->GetParameter(3);
+              // double n_plus_err = r->ParError(2);
+              // double tau_plus_err = r->ParError(3);
 
-              double tau_plus = func->GetParameter(3);
-              double reduce_chi_plus = r->Chi2()/r->Ndf();
-              if (!(tau_plus<2.25 && tau_plus>2.18)) cout << "\n\nerror on tau_plus\n" << tau_plus << "\n" << func->GetParameter(1)<< endl;
+
 
               func->ReleaseParameter(0);
-              func->ReleaseParameter(1);
-
+              // func->ReleaseParameter(2);
+              func->ReleaseParameter(4);
 
               // func->SetParameter(0, func->GetParameter(0));
               // func->SetParameter(1, func->GetParameter(1));
-              func->FixParameter(2, func->GetParameter(2));
-              func->FixParameter(3, func->GetParameter(3));
-              r = h->Fit("fun","SRQ");
+              // func->SetParameter(2, func->GetParameter(2));
+              // func->FixParameter(3, func->GetParameter(3));
+              TFitResultPtr r = h->Fit("fun","SRQ");
+              // h->SetTitle((title + "mu-").c_str());
+              // cnv->Modified();
+              // cnv->Update();
 
-              func->ReleaseParameter(2);
-              func->ReleaseParameter(3);
-              func->ReleaseParameter(4);
+              // if (save == 1) cnv->Print(("images/"+trimTitle(title)+"_muminus.png").c_str(), "png");
+
               double tau_minus = func->GetParameter(1);
               double reduce_chi_minus = r->Chi2()/r->Ndf();
 
@@ -215,7 +227,7 @@ int main(int argc, char** argv)
               // cout << "tau - ricavato: " << tau_minus << " ± " << tau_minus_err <<endl;
 
               //cout << "Fit status: "  << r->Status() << endl;
-              if (r->Status()==0 && tau_minus<2.09 && tau_minus>1.95 && tau_plus<2.25 && tau_plus>2.18){
+              if (r->Status()==0 && tau_minus<2.09 && tau_minus>1.95){
 
                   if (search==1){
 
@@ -231,8 +243,8 @@ int main(int argc, char** argv)
               }
                   else{
                   // if(r->Status()==0 && tau_plus<2.25 && tau_plus>2.05){
-                      tau << i <<"\t"<< j <<"\t"<<tau_plus<<endl;
-                      chi << i <<"\t"<< j <<"\t"<<reduce_chi_plus<<endl;
+                      // tau << i <<"\t"<< j <<"\t"<<tau_plus<<endl;
+                      // chi << i <<"\t"<< j <<"\t"<<<<endl;
                   // }
                   // else{
                   //     cout << "Error" << k << " " << bins << " " << x << "\t" << tau_minus<< endl;
@@ -241,7 +253,7 @@ int main(int argc, char** argv)
               }
               }
               else{
-                  cout << "Error" << k << " " << bins << " " << x << "\t" << tau_minus << "\t " << tau_plus << endl;
+                  cout << "Error" << k << " " << bins << " " << x << "\t" << tau_minus << endl;
                   k++;
               }
           }
