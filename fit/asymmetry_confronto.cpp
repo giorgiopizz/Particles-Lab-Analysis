@@ -1,5 +1,5 @@
 /*
-   c++ -o asymmetry asymmetry.cpp `root-config --cflags --glibs` ../lib/CfgParser.cc -lm
+   c++ -o asymmetry_confronto asymmetry_confronto.cpp `root-config --cflags --glibs` ../lib/CfgParser.cc -lm
  */
 
 #include <iostream>
@@ -18,6 +18,9 @@
 #include "TFitResult.h"
 #include "TMatrixDSym.h"
 #include "TMath.h"
+#include "TFile.h"
+#include "TMultiGraph.h"
+#include "TLegend.h"
 #include "../lib/CfgParser.h"
 
 using namespace std;
@@ -37,24 +40,29 @@ int main(int argc, char** argv)
         //char config_file[] = argv[1];
         char config_file[] = "../fit.cfg";
         CfgParser * gConfigParser = new CfgParser (config_file);
-        string name = gConfigParser->readStringOpt("general::asymmetry");
+        string name1 = "magnetico_acceso_asym";
+        string name2 = "magnetico_spento_perp_merged_tot";
 
         // int function_type = gConfigParser->readIntOpt (name+"::f_type");
 
 
         // string filename = gConfigParser->readStringOpt(name+"::filename");
 
-        string title = gConfigParser->readStringOpt(name+"::title");
+        // string title = gConfigParser->readStringOpt(name+"::title");
+        //
+        // int save = gConfigParser->readIntOpt(name+"::save");
 
-        int save = gConfigParser->readIntOpt(name+"::save");
+        // vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters");
 
-        vector<float> parameters = gConfigParser->readFloatListOpt (name+"::parameters");
+        vector<float> range = gConfigParser->readFloatListOpt (name1+"::range");
+        float bin = gConfigParser->readFloatOpt (name1+"::bin");
 
-        vector<float> range = gConfigParser->readFloatListOpt (name+"::range");
-        float bin = gConfigParser->readFloatOpt (name+"::bin");
+        string filename1_up = gConfigParser->readStringOpt(name1+"::filename_up");
+        string filename1_down = gConfigParser->readStringOpt(name1+"::filename_down");
 
-        string filename_up = gConfigParser->readStringOpt(name+"::filename_up");
-        string filename_down = gConfigParser->readStringOpt(name+"::filename_down");
+        string filename2_up = gConfigParser->readStringOpt(name2+"::filename_up");
+        string filename2_down = gConfigParser->readStringOpt(name2+"::filename_down");
+
 
         //int search = gConfigParser->readIntOpt (name+"::search");
 
@@ -63,20 +71,22 @@ int main(int argc, char** argv)
 
 
         TCanvas* cnv = new TCanvas("myC1","myC1",10,10,1200,800);
+        cnv->Divide(1,2);
         gStyle->SetOptStat(11);
         gStyle->SetOptFit(1111);
-        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0.59, 10.01);
+        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0, 11);
 
 
         func->SetParName(0,"A");
         func->FixParameter(0,0.03);
         func->SetParLimits(0,0.01,0.1);
         func->SetParName(1,"#omega");
-        func->SetParameter(1,1.65);
+        func->SetParameter(1,1.7);
         func->SetParLimits(1,1,3);
         func->SetParName(2,"c");
         func->SetParameter(2,0);
         func->SetParName(3,"#phi");
+        func->FixParameter(3, 0);
 
         // TF1 * func;
         // if(function_type==1){
@@ -190,36 +200,36 @@ int main(int argc, char** argv)
         // }
         //
 
-        double delay = 0.2;
+        double delay = 0.02;
         TH1F *h_up = new TH1F("hup", "example histogram",bin,0,11);
         ifstream inp;
         double x;
-        inp.open(filename_up);
+        inp.open(filename1_up);
         while(!(inp >> x)==0) {h_up->Fill(x-delay);}
         inp.close();
 
         TH1F *h_down = new TH1F("hdown", "exampole histogram",bin,0,11);
-        inp.open(filename_down);
+        inp.open(filename1_down);
         while(!(inp >> x)==0) {h_down->Fill(x);}
         inp.close();
-
-        TCanvas* cnv3 =  new TCanvas("myC3","myC3",10,10,1200,800);
-        cnv3->cd();
-        h_up->Draw();
-        TF1 * func3 = new TF1("fun3", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
-        func3->SetParameter(1,2.2);
-        h_up->Fit(func3);
-        cnv3->Modified();
-        cnv3->Update();
-
-        TCanvas* cnv4 =  new TCanvas("myC4","myC4",10,10,1200,800);
-        cnv4->cd();
-        h_down->Draw();
-        TF1 * func4 = new TF1("fun4", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
-        func4->SetParameter(1,2.2);
-        h_down->Fit(func4);
-        cnv4->Modified();
-        cnv4->Update();
+        //
+        // TCanvas* cnv3 =  new TCanvas("myC3","myC3",10,10,1200,800);
+        // cnv3->cd();
+        // h_up->Draw();
+        // TF1 * func3 = new TF1("fun3", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
+        // func3->SetParameter(1,2.2);
+        // h_up->Fit(func3);
+        // cnv3->Modified();
+        // cnv3->Update();
+        //
+        // TCanvas* cnv4 =  new TCanvas("myC4","myC4",10,10,1200,800);
+        // cnv4->cd();
+        // h_down->Draw();
+        // TF1 * func4 = new TF1("fun4", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
+        // func4->SetParameter(1,2.2);
+        // h_down->Fit(func4);
+        // cnv4->Modified();
+        // cnv4->Update();
 
         double x_axis[(int)bin];
         double y_axis[(int)bin];
@@ -240,14 +250,107 @@ int main(int argc, char** argv)
 
         TGraph * g = new TGraphErrors(bin, x_axis, y_axis, x_error, y_error);
 
-        cnv->cd();
-        g->Draw("ALP");
+        // cnv->cd();
+        auto mg = new TMultiGraph();
+        g->SetMarkerStyle(20);
+        mg->Add(g);
+        // g->Draw("ACP");
+        // func->SetParameter(1,1.70);
         g->GetXaxis()->SetRangeUser(0.3,11);
         TFitResultPtr r = g->Fit(func,"SR");
+
+
+        TFile * sim = new TFile("../asymmetry_confronto_simulazione.root", "read");
+
+        sim->ls();
+        TGraphErrors * h1 = (TGraphErrors*)sim->Get("acceso");
+        // for(int i=0;i<h1->GetN();i++){
+        //     h1->SetPointError(i, 0,0);
+        // }
+        // h1->MovePoints(0, -0.3113);
+        h1->SetLineStyle(10);
+
+        h1->SetMarkerStyle(21);
+        h1->GetXaxis()->SetLimits(0,7);
+        func->SetParameter(1,1.70);
+        h1->Fit(func, "SR");
+        // h1->Draw("same");
+        auto mg1 = new TMultiGraph();
+        mg1->Add(h1);
+        TGraphErrors * h2 = (TGraphErrors*)sim->Get("spento");
+        // for(int i=0;i<h2->GetN();i++){
+        //     h2->SetPointError(i, 0,0);
+        // }
+        // h2->MovePoints(0, -0.3113);
+        h2->SetLineStyle(10);
+        h2->SetMarkerColor(3);
+        h2->SetMarkerStyle(21);
+        h2->GetXaxis()->SetLimits(0,7);
+        // h2->Draw("same");
+        mg1->Add(h2);
+        sim->Close();
+        cnv->cd(2);
+        mg1->SetTitle("Simulazione");
+        mg1->Draw("ACP");
+
+        h_up = new TH1F("hup", "example histogram",bin,0,11);
+        inp.open(filename2_up);
+        while(!(inp >> x)==0) {h_up->Fill(x-delay);}
+        inp.close();
+
+        h_down = new TH1F("hdown", "exampole histogram",bin,0,11);
+        inp.open(filename2_down);
+        while(!(inp >> x)==0) {h_down->Fill(x);}
+        inp.close();
+        //
+        // TCanvas* cnv3 =  new TCanvas("myC3","myC3",10,10,1200,800);
+        // cnv3->cd();
+        // h_up->Draw();
+        // TF1 * func3 = new TF1("fun3", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
+        // func3->SetParameter(1,2.2);
+        // h_up->Fit(func3);
+        // cnv3->Modified();
+        // cnv3->Update();
+        //
+        // TCanvas* cnv4 =  new TCanvas("myC4","myC4",10,10,1200,800);
+        // cnv4->cd();
+        // h_down->Draw();
+        // TF1 * func4 = new TF1("fun4", "[0]*TMath::Exp(-x[0]/[1]) + [2]",0, 11);
+        // func4->SetParameter(1,2.2);
+        // h_down->Fit(func4);
+        // cnv4->Modified();
+        // cnv4->Update();
+
+        double x2_axis[(int)bin];
+        double y2_axis[(int)bin];
+        double x2_error[(int)bin];
+        double y2_error[(int)bin];
+        for(int i=1;i<bin+1;i++){
+            x2_axis[i] = h_up->GetBinCenter(i);
+            x2_error[i] = (11-0)/(bin*sqrt(12));
+            up = h_up->GetBinContent(i);
+            down = h_down->GetBinContent(i);
+            if (up+down!=0){
+                y2_axis[i] = (up-down)/(up+down);
+                y2_error[i] = 2*sqrt(up*down/pow(up+down,3));
+            }
+            else y2_axis[i] = 0;
+        }
+
+        TGraph * g1 = new TGraphErrors(bin, x2_axis, y2_axis, x2_error, y2_error);
+        g1->SetLineColor(3);
+        g1->SetMarkerColor(3);
+        g1->SetMarkerSize(1);
+        g1->SetMarkerStyle(20);
+        // g1->Draw("same");
+        mg->Add(g1);
+        cnv->cd(1);
+        mg->SetTitle("Esperimento");
+        mg->Draw("ACP");
+
         double csi = func->GetParameter(0)*6/0.54;
         cout << "La csi: " << csi << endl;
-        // double bfield = 21.74e-4;
-        double bfield = 20.0e-4;
+        double bfield = 21.74e-4;
         double omega = func->GetParameter(1)*1.e6 ; //MHz
         double hbar=1.054e-34;  // J s
         double q=1.602e-19;     //  C
@@ -279,6 +382,13 @@ int main(int argc, char** argv)
 
         cnv->Modified();
         cnv->Update();
+
+
+        auto legend = new TLegend(0.1,0.7,0.48,0.9);
+   legend->SetHeader("Legenda","C"); // option "C" allows to center the header
+   legend->AddEntry(g,"Magnetico Acceso","lep");
+   legend->AddEntry(g1,"Magnetico Acceso","lep");
+   legend->Draw();
 
         //
         //
