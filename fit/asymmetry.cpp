@@ -65,18 +65,19 @@ int main(int argc, char** argv)
         TCanvas* cnv = new TCanvas("myC1","myC1",10,10,1200,800);
         gStyle->SetOptStat(11);
         gStyle->SetOptFit(1111);
-        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0.59, 10.01);
+        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0.46, 6.1);
 
 
         func->SetParName(0,"A");
-        func->FixParameter(0,0.03);
-        func->SetParLimits(0,0.01,0.1);
+        func->FixParameter(0,0.0289);
+        // func->SetParLimits(0,0.01,0.1);
         func->SetParName(1,"#omega");
-        func->SetParameter(1,1.65);
-        func->SetParLimits(1,1,3);
+        func->SetParameter(1,1.7);
+        func->SetParLimits(1,1.5,2);
         func->SetParName(2,"c");
         func->SetParameter(2,0);
         func->SetParName(3,"#phi");
+        func->FixParameter(3,0);
 
         // TF1 * func;
         // if(function_type==1){
@@ -241,8 +242,9 @@ int main(int argc, char** argv)
         TGraph * g = new TGraphErrors(bin, x_axis, y_axis, x_error, y_error);
 
         cnv->cd();
-        g->Draw("ALP");
+        g->Draw("ACP");
         g->GetXaxis()->SetRangeUser(0.3,11);
+
         TFitResultPtr r = g->Fit(func,"SR");
         double csi = func->GetParameter(0)*6/0.54;
         cout << "La csi: " << csi << endl;
@@ -254,9 +256,10 @@ int main(int argc, char** argv)
         double c=2.998e8; // m/s
         double m=105.658e6*q/(c*c);
         double magneton=q*hbar/(2.*m);  // 4.485e-26 * J/T
-
+        double g_teor = 2.00233184122;
         double g_stim=omega*hbar/(magneton*bfield);
         cout << "Val g: " << g_stim <<endl;
+        cout << "t: " << abs(g_teor-g_stim)/(hbar/(magneton*bfield)*func->GetParError(1)*1e+6);
         // h->Draw();
 
         // TFitResultPtr r = h->Fit("fun","SR");

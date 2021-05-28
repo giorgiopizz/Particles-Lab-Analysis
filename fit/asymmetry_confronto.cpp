@@ -74,17 +74,17 @@ int main(int argc, char** argv)
         cnv->Divide(1,2);
         gStyle->SetOptStat(11);
         gStyle->SetOptFit(1111);
-        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0, 11);
+        TF1 * func = new TF1("fun", "[0]*TMath::Cos([1]*x[0]+[3])+[2]",0, 6.10);
 
 
         func->SetParName(0,"A");
-        func->FixParameter(0,0.03);
-        func->SetParLimits(0,0.01,0.1);
+        func->FixParameter(0,0.0289);
+        // func->SetParLimits(0,0.01,0.1);
         func->SetParName(1,"#omega");
-        func->SetParameter(1,1.7);
+        func->FixParameter(1,1.8487);
         func->SetParLimits(1,1,3);
         func->SetParName(2,"c");
-        func->SetParameter(2,0);
+        func->FixParameter(2,-0.3816);
         func->SetParName(3,"#phi");
         func->FixParameter(3, 0);
 
@@ -380,16 +380,16 @@ int main(int argc, char** argv)
         */
         // h->SetTitle(title.c_str());
 
-        cnv->Modified();
-        cnv->Update();
 
 
-        auto legend = new TLegend(0.1,0.7,0.48,0.9);
+
+    auto legend = new TLegend(0.1,0.7,0.48,0.9);
    legend->SetHeader("Legenda","C"); // option "C" allows to center the header
    legend->AddEntry(g,"Magnetico Acceso","lep");
-   legend->AddEntry(g1,"Magnetico Acceso","lep");
+   legend->AddEntry(g1,"Magnetico Spento","lep");
    legend->Draw();
-
+   cnv->Modified();
+   cnv->Update();
         //
         //
         // TF1* f_down = new TF1("down","[0]*exp(-x[0]/[1])*(1 + [2]*cos([3]*x[0] + [4]) )", 0.2, 11);
