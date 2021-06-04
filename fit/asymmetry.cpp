@@ -249,6 +249,7 @@ int main(int argc, char** argv)
         double csi = func->GetParameter(0)*6/0.54;
         cout << "La csi: " << csi << endl;
         // double bfield = 21.74e-4;
+        // DOVREBBE VENIRCI UNA OMEGA DI 1.788488
         double bfield = 20.0e-4;
         double omega = func->GetParameter(1)*1.e6 ; //MHz
         double hbar=1.054e-34;  // J s
