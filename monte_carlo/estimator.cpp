@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
     std::vector<double> tau;
     std::vector<double> chi_square;
-    int experiments = 5000;
+    int experiments = 10000;
     int counts = 25000;
     gStyle->SetOptStat(11);
     gStyle->SetOptFit(1111);
@@ -85,21 +85,24 @@ int main(int argc, char** argv)
 
     TApplication* myApp = new TApplication("myApp", NULL, NULL);
 
-    // double f_mu_pos = r->Gaus(0.56075, 0.00087);
-    double f_mu_pos = 0.56075;
-    // double f_mu_pos = 0.8;
-    double f_mu_neg = 1 - f_mu_pos;
+
 
     for(int i=0;i<experiments;i++){
         // TCanvas* cnv1 = new TCanvas(("myC1" + to_string(i)).c_str(),"myC1",10,10,1200,800);
         // generate each pseudoexperiment
         // in a single experiment we populate an histogram with the histo_populate
         // method, we then fit this histogram in order to estimate tau,
+
+        func->SetParameter(1,2.100);
+
         double min=0, max=11;
         int bin = 100;
         TH1F *h = new TH1F("h", "example histogram",bin,min,max);
-
-
+        //0.56075 0.00087
+        double f_mu_pos = r->Gaus(0.56075, 0.03);
+        // double f_mu_pos = 0.56075;
+        // double f_mu_pos = 0.8;
+        double f_mu_neg = 1 - f_mu_pos;
         // generate number of mu+ and mu-
 
 
@@ -145,13 +148,14 @@ int main(int argc, char** argv)
     gStyle->SetOptFit(1111);
     double min = *min_element(tau.begin(), tau.end());
     double max = *max_element(tau.begin(), tau.end());
-    TH1F *h = new TH1F("h", "tau_MC",30, min, max);
+    TH1F *h = new TH1F("h", "tau_MC",40, min, max);
 
     for(double t: tau)   h->Fill(t);
 
     h-> Draw();
     TF1 * func2 = new TF1("fun2", "gaus",min, max);
     h->Fit(func2);
+    cout << "tau medio: " << func2->GetParameter(1) << " +- " << func2->GetParameter(2) << endl;
     cnv->Modified();
     cnv->Update();
     cnv->SaveAs("images/tau_MC.png");
