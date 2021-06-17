@@ -1,0 +1,6 @@
+cuts on x: 0.4, 0.7
+cuts on bins: 70, 125
+Min tau: 0.645974
+Max tau: 0.450366
+Mean: 0.551359
+Std: 0.0453295
